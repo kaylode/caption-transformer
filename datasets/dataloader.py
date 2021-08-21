@@ -1,4 +1,4 @@
-from .textset import TextSet
+from .dataset import ImageTextSet
 from torch.utils.data import DataLoader
 from torchtext.legacy.data import BucketIterator
 
@@ -9,26 +9,26 @@ class EqualLengthTextLoader(BucketIterator):
     """
     def __init__(self, 
                 batch_size,
+                input_path,
                 csv_file,
-                src_tokenizer,
-                tgt_tokenizer, 
+                tokenizer,
+                image_size,
+                keep_ratio,
                 device,
                 **kwargs):
        
-        self.dataset = TextSet(
-                csv_file,
-                src_tokenizer,
-                tgt_tokenizer)
+        self.dataset = ImageTextSet(
+                input_path, csv_file, tokenizer, 
+                image_size=image_size, keep_ratio=keep_ratio)
 
-        self.src_tokenizer = self.dataset.src_tokenizer
-        self.tgt_tokenizer = self.dataset.tgt_tokenizer
+        self.stokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn
         
         super(EqualLengthTextLoader, self).__init__(
             self.dataset,
             batch_size=batch_size,
             device=device, 
-            sort_key=lambda x: len(x['src_text']),
+            sort_key=lambda x: len(x['text']),
             repeat=True, # Repeat the iterator for multiple epochs.
             sort=False,  # Sort all examples in data using `sort_key`.
             shuffle=True, # Shuffle data on each epoch run.
@@ -41,18 +41,18 @@ class RawTextLoader(DataLoader):
     """
     def __init__(self, 
                 batch_size,
+                input_path,
                 csv_file,
-                src_tokenizer,
-                tgt_tokenizer, 
+                tokenizer,
+                image_size,
+                keep_ratio,
                 **kwargs):
        
-        self.dataset = TextSet(
-                csv_file,
-                src_tokenizer,
-                tgt_tokenizer)
+        self.dataset = ImageTextSet(
+                input_path, csv_file, tokenizer, 
+                image_size=image_size, keep_ratio=keep_ratio)
 
-        self.src_tokenizer = self.dataset.src_tokenizer
-        self.tgt_tokenizer = self.dataset.tgt_tokenizer
+        self.stokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn
         
         super(RawTextLoader, self).__init__(
