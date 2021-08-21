@@ -32,10 +32,10 @@ def train(args, config):
     criterion = nn.CrossEntropyLoss(
             ignore_index=trainset.tgt_tokenizer.pad_token_id)
 
-    model = Translator(
+    model = Captioning(
             model = net,
             criterion=criterion,
-            metrics=NLPMetrics(valloader, metrics_list=['bleu', "meteor"]),
+            metrics=NLPMetrics(valloader, metrics_list=['bleu', "meteor", 'rouge', 'cider', 'spice']),
             scaler=NativeScaler(),
             optimizer= optimizer,
             optim_params = optimizer_params,     

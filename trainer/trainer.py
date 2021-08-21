@@ -229,18 +229,20 @@ class Trainer():
                 break
 
             raw_targets = batch['tgt_texts_raw']
-            raw_sources = batch['src_texts_raw']
+            ori_imgs = batch['ori_imgs']
+            image_names = batch['image_names']
             preds = self.model.inference_step(batch, self.valloader.tgt_tokenizer)
-            for raw_source, raw_target, pred in zip(raw_sources, raw_targets, preds):
-                result['gt'].append(raw_target)
+            for image_name, gt, pred in zip(image_names, raw_targets, preds):
+                result['image_name'].append(image_name)
+                result['gt'].append(gt)
                 result['pred'].append(pred)
 
-                self.logger.write_text(f"GT: {raw_target}", f"Pred: {pred}", self.epoch)
+                # self.logger.write_text(f"GT: {raw_target}", f"Pred: {pred}", self.epoch)
 
-                figs = draw_attention_map(raw_source, pred, self.model.model, show_fig=False, return_figs=True)
-                for tag, fig in figs:
-                    tag = f"{idx}/{tag}"
-                    self.logger.write_image(tag, fig, self.epoch)
+                # figs = draw_attention_map(raw_source, pred, self.model.model, show_fig=False, return_figs=True)
+                # for tag, fig in figs:
+                #     tag = f"{idx}/{tag}"
+                #     self.logger.write_image(tag, fig, self.epoch)
             
         pd.DataFrame(result).to_csv('./samples/sample.csv', index=False)
         

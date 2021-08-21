@@ -127,16 +127,17 @@ def get_dataset_and_dataloader(config):
 
     trainloader = EqualLengthTextLoader(
         csv_file=config.train_csv,
-        src_tokenizer=AutoTokenizer.from_pretrained(config.source_language),
-        tgt_tokenizer=AutoTokenizer.from_pretrained(config.target_language), 
+        input_path=config.image_path,
+        tokenizer=AutoTokenizer.from_pretrained(config.language),
+        image_size=config.image_size, keep_ratio=config.keep_ratio,
         batch_size=config.batch_size, device=device)
 
     valloader = RawTextLoader(
         batch_size=1,
         csv_file=config.val_csv,
-        src_tokenizer=AutoTokenizer.from_pretrained(config.source_language),
-        tgt_tokenizer=AutoTokenizer.from_pretrained(config.target_language))
-
+        input_path=config.image_path,
+        tokenizer=AutoTokenizer.from_pretrained(config.language),
+        image_size=config.image_size, keep_ratio=config.keep_ratio)
 
     return  trainloader.dataset, valloader.dataset, trainloader, valloader
 
