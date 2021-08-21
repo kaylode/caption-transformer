@@ -130,6 +130,7 @@ def get_dataset_and_dataloader(config):
         input_path=config.image_path,
         tokenizer=AutoTokenizer.from_pretrained(config.language),
         image_size=config.image_size, keep_ratio=config.keep_ratio,
+        patch_size=config.patch_size,
         batch_size=config.batch_size, device=device)
 
     valloader = RawTextLoader(
@@ -137,6 +138,7 @@ def get_dataset_and_dataloader(config):
         csv_file=config.val_csv,
         input_path=config.image_path,
         tokenizer=AutoTokenizer.from_pretrained(config.language),
+        patch_size=config.patch_size,
         image_size=config.image_size, keep_ratio=config.keep_ratio)
 
     return  trainloader.dataset, valloader.dataset, trainloader, valloader

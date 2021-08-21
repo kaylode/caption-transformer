@@ -12,8 +12,9 @@ class ImageTextSet:
     """
     Input path to csv file contains texts
     """
-    def __init__(self, input_path, csv_file, tokenizer, image_size=[512,512], keep_ratio=False):
+    def __init__(self, input_path, csv_file, tokenizer, image_size=[512,512], keep_ratio=False, patch_size=16):
         self.image_size = image_size
+        self.patch_size = patch_size
         self.csv_file = csv_file
         self.input_path = input_path
         self.tokenizer = tokenizer
@@ -24,6 +25,9 @@ class ImageTextSet:
         ])
         self.load_data()
 
+    def get_patch_dim(self):
+        return self.patch_size * self.patch_size * 3
+        
     def load_data(self):
         self.df = pd.read_csv(self.csv_file)
 

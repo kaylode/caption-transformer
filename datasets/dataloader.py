@@ -13,12 +13,13 @@ class EqualLengthTextLoader(BucketIterator):
                 csv_file,
                 tokenizer,
                 image_size,
+                patch_size,
                 keep_ratio,
                 device,
                 **kwargs):
        
         self.dataset = ImageTextSet(
-                input_path, csv_file, tokenizer, 
+                input_path, csv_file, tokenizer, patch_size=patch_size,
                 image_size=image_size, keep_ratio=keep_ratio)
 
         self.stokenizer = self.dataset.tokenizer
@@ -45,11 +46,12 @@ class RawTextLoader(DataLoader):
                 csv_file,
                 tokenizer,
                 image_size,
+                patch_size,
                 keep_ratio,
                 **kwargs):
        
         self.dataset = ImageTextSet(
-                input_path, csv_file, tokenizer, 
+                input_path, csv_file, tokenizer, patch_size=patch_size,
                 image_size=image_size, keep_ratio=keep_ratio)
 
         self.stokenizer = self.dataset.tokenizer

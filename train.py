@@ -24,13 +24,13 @@ def train(args, config):
     trainset, valset, trainloader, valloader = get_dataset_and_dataloader(config)
     
     net = get_transformer_model(
-        src_vocab=trainloader.src_tokenizer.vocab_size,
-        trg_vocab=trainloader.tgt_tokenizer.vocab_size)
+        patches_dim=trainset.get_patch_dim(),
+        trg_vocab=trainset.tokenizer.vocab_size)
 
     optimizer, optimizer_params = get_lr_policy(config.lr_policy)
 
     criterion = nn.CrossEntropyLoss(
-            ignore_index=trainset.tgt_tokenizer.pad_token_id)
+            ignore_index=trainset.tokenizer.pad_token_id)
 
     model = Captioning(
             model = net,

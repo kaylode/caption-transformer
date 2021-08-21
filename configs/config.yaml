@@ -9,7 +9,9 @@ settings:
   
   model_name:  'catr' 
   language:    'bert-base-uncased'
-  
+  image_size:   [384,384]
+  patch_size:   16
+
   gpu_devices: '0'                     # supports multi-gpus
   num_epochs: 20
   batch_size: 8
