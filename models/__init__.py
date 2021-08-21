@@ -1,17 +1,18 @@
 from .transformer import Transformer
 from .seq2seq import Seq2Seq
-from .translator import Translator
+from .captioning import Captioning
 
-def get_transformer_model(src_vocab, trg_vocab):
+def get_transformer_model(patches_dim, trg_vocab):
 
     transformer_config = {
-        'src_vocab':        src_vocab, 
+        'patches_dim':      patches_dim, 
         'trg_vocab':        trg_vocab, 
-        "d_model":          512, 
+        "d_model":          768, 
         "d_ff":             2048,
-        "N":                6,
-        "heads":            8,
-        "dropout":          0.1
+        "N_enc":            12,
+        "N_dec":            4,
+        "heads":            12,
+        "dropout":          0.2
     }
 
     return Transformer(**transformer_config)

@@ -4,9 +4,9 @@ from models.transformer.search import sampling_search
 import sys
 sys.path.append('..')
 
-class Translator(BaseModel):
+class Captioning(BaseModel):
     def __init__(self, model, **kwargs):
-        super(Translator, self).__init__(**kwargs)
+        super(Captioning, self).__init__(**kwargs)
         self.model = model
         self.model_name = self.model.name
         if self.optimizer is not None:
@@ -25,11 +25,11 @@ class Translator(BaseModel):
 
     def training_step(self, batch):
 
-        src_inputs = batch['src_inputs'].to(self.device)
-        src_masks = batch['src_masks'].unsqueeze(-2).to(self.device)
-        tgt_inputs = batch['tgt_inputs'].to(self.device)
-        tgt_targets = batch['tgt_targets'].to(self.device)
-        tgt_masks = batch['tgt_masks'].to(self.device)
+        src_inputs = batch['image_patches'].to(self.device)
+        src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
+        tgt_inputs = batch['texts_inp'].to(self.device)
+        tgt_targets = batch['texts_res'].to(self.device)
+        tgt_masks = batch['text_masks'].to(self.device)
 
         outputs = self.model(
             src = src_inputs, 
@@ -46,8 +46,8 @@ class Translator(BaseModel):
 
     def inference_step(self, batch, tgt_tokenizer):
 
-        src_inputs = batch['src_inputs'].to(self.device)
-        src_masks = batch['src_masks'].unsqueeze(-2).to(self.device)
+        src_inputs = batch['image_patches'].to(self.device)
+        src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
 
         outputs = self.model.predict(
             src_inputs = src_inputs,
@@ -57,11 +57,11 @@ class Translator(BaseModel):
         return outputs  
 
     def evaluate_step(self, batch):
-        src_inputs = batch['src_inputs'].to(self.device)
-        src_masks = batch['src_masks'].unsqueeze(-2).to(self.device)
-        tgt_inputs = batch['tgt_inputs'].to(self.device)
-        tgt_targets = batch['tgt_targets'].to(self.device)
-        tgt_masks = batch['tgt_masks'].to(self.device)
+        src_inputs = batch['image_patches'].to(self.device)
+        src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
+        tgt_inputs = batch['texts_inp'].to(self.device)
+        tgt_targets = batch['texts_res'].to(self.device)
+        tgt_masks = batch['text_masks'].to(self.device)
 
         outputs = self.model(
             src = src_inputs, 
