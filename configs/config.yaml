@@ -1,14 +1,14 @@
 settings:
   #################   DATASET CONFIG   ###################
 
-  project_name: "nmt_vi_en"    # also the folder name of the dataset that under ./data folder
+  project_name: "flickr30k-caption"    # also the folder name of the dataset that under ./data folder
+  image_path: 
   train_csv:
   val_csv:
   #################   TRAINING CONFIG   ###################
   
-  model_name: 'transformer' 
-  source_language:    'bert-base-uncased'
-  target_language:    'vinai/phobert-base'
+  model_name:  'catr' 
+  language:    'bert-base-uncased'
   
   gpu_devices: '0'                     # supports multi-gpus
   num_epochs: 20
@@ -20,7 +20,7 @@ settings:
     name: "adam"                         #[adam|sgd]
     lr: 0.0001                            #[adam: 1e-3 | sgd: 1e-2]
     momentum: 0.9
-    weight_decay: 0.0005
+    weight_decay: 0.000001
 
   lr_scheduler:
     name: "cosine2"                      #[plateau | cosine | 1cycle-yolo | 1cycle]
