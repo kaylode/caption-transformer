@@ -16,7 +16,7 @@ def convert_ids_to_toks(token_ids, tokenizer):
         tok_words = tokenizer.convert_ids_to_tokens(tok_ids)
         result_toks = []
         for word in tok_words:
-            if word == tokenizer.eos_token:
+            if word == tokenizer.eos_token or word == tokenizer.sep_token:
                 break
             if word not in special_tokens:
                 result_toks.append(word)
@@ -82,7 +82,7 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
     
     model.eval()
     batch_size = src.shape[0]
-    start_symbol = tokenizer.bos_token_id
+    start_symbol = tokenizer.bos_token_id or tokenizer.cls_token_id
     device = next(model.parameters()).device
     if max_len is None:
         max_len = src.shape[-1]
@@ -90,10 +90,10 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
     # Result tokens
     ys = torch.ones(batch_size, 1).fill_(start_symbol).long()
 
-    # Encoder output
-    memory = model.encoder(src, src_mask)
-    
     with torch.no_grad():
+        # Encoder output
+        memory = model.encoder(src, src_mask)
+    
         for i in range(max_len-1):
 
             # Target masks
@@ -146,7 +146,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         Encode texts and initialize beam
         """
         batch_size = src_text.shape[0]
-        start_symbol = tgt_tokenizer.bos_token_id
+        start_symbol = tgt_tokenizer.bos_token_id or tokenizer.cls_token_id
         
         # Encoded inputs
         memory = model.encoder(src_text, src_mask)
