@@ -11,7 +11,7 @@ def get_transformer_model(patches_dim, trg_vocab):
         "d_ff":             2048,
         "N_enc":            12,
         "N_dec":            4,
-        "heads":            12,
+        "heads":            8,
         "dropout":          0.2
     }
 

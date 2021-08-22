@@ -56,7 +56,7 @@ class RawTextLoader(DataLoader):
                 input_path, csv_file, tokenizer, patch_size=patch_size,
                 image_size=image_size, keep_ratio=keep_ratio,type=type)
 
-        self.stokenizer = self.dataset.tokenizer
+        self.tokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn
         
         super(RawTextLoader, self).__init__(
