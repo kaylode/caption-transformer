@@ -6,13 +6,13 @@ import pandas as pd
 
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
-from augmentations.transforms import get_resize_augmentation, MEAN, STD
+from augmentations.transforms import get_resize_augmentation, get_augmentation, MEAN, STD
 
 class ImageTextSet:
     """
     Input path to csv file contains texts
     """
-    def __init__(self, input_path, csv_file, tokenizer, image_size=[512,512], keep_ratio=False, patch_size=16):
+    def __init__(self, input_path, csv_file, tokenizer, image_size=[512,512], keep_ratio=False, patch_size=16, type='train'):
         self.image_size = image_size
         self.patch_size = patch_size
         self.csv_file = csv_file
@@ -20,8 +20,7 @@ class ImageTextSet:
         self.tokenizer = tokenizer
         self.transforms = A.Compose([
             get_resize_augmentation(image_size, keep_ratio=keep_ratio),
-            A.Normalize(mean=MEAN, std=STD, max_pixel_value=1.0, p=1.0),
-            ToTensorV2(p=1.0)
+            get_augmentation(_type=type)
         ])
         self.load_data()
 
