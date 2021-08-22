@@ -134,20 +134,12 @@ def get_augmentation(_type='train'):
         ToTensorV2(p=1.0)
     ]
 
-    train_transforms = A.Compose(transforms_list, bbox_params=A.BboxParams(
-        format='pascal_voc',
-        min_area=2, 
-        min_visibility=0.2, 
-        label_fields=['class_labels']))
+    train_transforms = A.Compose(transforms_list)
 
     val_transforms = A.Compose([
         A.Normalize(mean=MEAN, std=STD, max_pixel_value=1.0, p=1.0),
         ToTensorV2(p=1.0)
-    ], bbox_params=A.BboxParams(
-        format='pascal_voc', 
-        min_area=0, 
-        min_visibility=0,
-        label_fields=['class_labels']))
+    ])
     
 
     return train_transforms if _type == 'train' else val_transforms
