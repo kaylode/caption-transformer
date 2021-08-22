@@ -116,7 +116,7 @@ class NLPMetrics(TemplateMetric):
                         break
 
                     raw_targets = batch['tgt_texts_raw']
-                    preds = self.model.inference_step(batch, self.dataloader.tgt_tokenizer)
+                    preds = self.model.inference_step(batch, self.dataloader.tokenizer)
 
                     for raw_target, pred in zip(raw_targets, preds):
 
