@@ -10,6 +10,7 @@ settings:
   model_name:  'catr' 
   language:    'bert-base-uncased'
   image_size:   [384,384]
+  keep_ratio:   False
   patch_size:   16
 
   gpu_devices: '0'                     # supports multi-gpus
@@ -20,7 +21,7 @@ settings:
   # learning rate policy
   lr_policy:
     name: "adam"                         #[adam|sgd]
-    lr: 0.0001                            #[adam: 1e-3 | sgd: 1e-2]
+    lr: 0.0003                            #[adam: 1e-3 | sgd: 1e-2]
     momentum: 0.9
     weight_decay: 0.000001
 
