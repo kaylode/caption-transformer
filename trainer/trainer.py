@@ -215,6 +215,7 @@ class Trainer():
         
     def visualize_batch(self):
         from models.transformer import draw_attention_map
+        from utils.utils import draw_image_caption
 
         if not os.path.exists('./samples'):
             os.mkdir('./samples')
@@ -231,18 +232,19 @@ class Trainer():
             raw_targets = batch['tgt_texts_raw']
             ori_imgs = batch['ori_imgs']
             image_names = batch['image_names']
-            preds = self.model.inference_step(batch, self.valloader.tgt_tokenizer)
-            for image_name, gt, pred in zip(image_names, raw_targets, preds):
+            preds = self.model.inference_step(batch, self.valloader.tokenizer)
+            for i in range(len(ori_imgs)):
+                image_name = os.path.basename(image_names[i])
                 result['image_name'].append(image_name)
-                result['gt'].append(gt)
-                result['pred'].append(pred)
+                result['gt'].append(raw_targets[i])
+                result['pred'].append(preds[i])
 
-                # self.logger.write_text(f"GT: {raw_target}", f"Pred: {pred}", self.epoch)
+                fig = draw_image_caption(
+                    image = ori_imgs[i],
+                    text = f"GT: {raw_targets[i]} \n Pred: {preds[i]}")
 
-                # figs = draw_attention_map(raw_source, pred, self.model.model, show_fig=False, return_figs=True)
-                # for tag, fig in figs:
-                #     tag = f"{idx}/{tag}"
-                #     self.logger.write_image(tag, fig, self.epoch)
+                tag = f"{image_name}"
+                self.logger.write_image(tag, fig, self.epoch)
             
         pd.DataFrame(result).to_csv('./samples/sample.csv', index=False)
         

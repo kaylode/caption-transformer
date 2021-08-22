@@ -1,4 +1,6 @@
+import torch
 import gdown
+import matplotlib.pyplot as plt 
 
 def download_weights(id_or_url, cached=None, md5=None, quiet=False):
     if id_or_url.startswith('http'):
@@ -48,3 +50,21 @@ def crop_box(image, box, expand=0):
 
     #xyxy box, cv2 image h,w,c
     return image[int(new_box[1]):int(new_box[3]), int(new_box[0]):int(new_box[2]), :]
+
+def draw_image_caption(image, text, image_name=None, figsize=(10,10)):
+
+    plt.close('all')
+    fig = plt.figure(figsize=figsize)
+
+    if isinstance(image, torch.Tensor):
+        image = image.numpy().squeeze().transpose((1,2,0))
+
+    # Display the image
+    plt.imshow(image)
+    plt.axis('off')
+    fig.text(.5, .05, text, ha='center')
+
+    if image_name:
+        plt.savefig(image_name, bbox_inches='tight')
+
+    return fig
