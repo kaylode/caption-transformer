@@ -66,26 +66,15 @@ def get_resize_augmentation(image_size, keep_ratio=False, box_transforms = False
 def get_augmentation(_type='train'):
 
     config = Config('./augmentations/augments.yaml')
-    blur_config = config.blur
     flip_config = config.flip
     ssr_config = flip_config['shift_scale_crop']
     color_config = config.color
     quality_config = config.quality
-    removal_config = config.removal
-    cutout_config = removal_config['cutout']
 
     transforms_list = [
-        A.OneOf([
-            A.MotionBlur(p=blur_config['motion']),
-            A.GaussianBlur(p=blur_config['gaussian']),
-            A.MedianBlur(blur_limit=3, p=blur_config['median']),
-            A.Blur(blur_limit=3, p=blur_config['default']),
-        ], p=blur_config['prob']),
 
         A.OneOf([
-            A.RandomRotate90(p=flip_config['rotate90']),
             A.HorizontalFlip(p=flip_config['hflip']),
-            A.VerticalFlip(p=flip_config['vflip']),
         ], p=flip_config['prob']),
 
         A.OneOf([
@@ -106,7 +95,6 @@ def get_augmentation(_type='train'):
                 A.FromFloat(dtype='uint8', p=1),
                 A.OneOf([
                     A.CLAHE(clip_limit=2.0, tile_grid_size=(8,8), p=quality_config['clahe']),
-                    A.JpegCompression(p=quality_config['compression']),
                 ], p=0.7),
                 A.ToFloat(p=1),
             ])           
@@ -120,13 +108,6 @@ def get_augmentation(_type='train'):
             border_mode=cv2.BORDER_CONSTANT,
             value=0,
             p=ssr_config['prob']),
-
-        CustomCutout(
-            bbox_removal_threshold=cutout_config['threshold'],
-            min_cutout_size=cutout_config['min_size'],
-            max_cutout_size=cutout_config['max_size'],
-            number=cutout_config['number'], 
-            p=cutout_config['prob']),
     ]
         
     transforms_list += [
