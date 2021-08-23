@@ -1,4 +1,3 @@
-from .dataset import ImageTextSet
 from .cocoset import CocoDataset
 from torch.utils.data import DataLoader
 from torchtext.legacy.data import BucketIterator
