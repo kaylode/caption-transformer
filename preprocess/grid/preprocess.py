@@ -1,7 +1,6 @@
-import argparse
 import os
 import torch
-import tqdm
+from tqdm import tqdm
 import numpy as np
 from PIL import Image
 
@@ -9,9 +8,6 @@ from pycocotools.coco import COCO
 
 from torchvision import transforms
 from .inception import inception_v3_base
-
-parser = argparse.ArgumentParser('Training Object Detection')
-parser.add_argument('--features_dir', type=str, help='Feature output dir')
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, root_dir, ann_path):
@@ -35,38 +31,44 @@ class ImageDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image_path = self.load_image(idx)
-        with Image.open(image_path).convert('RGB') as img:
-            return self.transform(img), self.image_ids[idx]
+        img = Image.open(image_path).convert('RGB')
+        img = self.transform(img)
+        return img, self.image_ids[idx]
+    
+    def collate_fn(self, batch):
+        imgs = [s[0] for s in batch]
+        ids = [s[1] for s in batch]
+
+        return torch.stack(imgs), ids
 
 
 
-def main(args):
+def main():
     
     device = torch.device('cuda')
     inception = inception_v3_base(pretrained=True)
     inception.eval()
     inception.to(device)
 
-    features_dir = args.features_dir
+    features_dir = "/content/data/features"
 
     dataset = ImageDataset(
-        root_dir='/content/data/',
-        ann_path='train.json')
+        root_dir='/content/data/flickr30k/images',
+        ann_path='/content/data/flickr30k/annotations/train.json')
 
-    loader = torch.utils.data.DataLoader(dataset,
+    dataloader = torch.utils.data.DataLoader(dataset,
                                          batch_size=32,
-                                         num_workers=2,
-                                         pin_memory=True,
-                                         shuffle=False)
+                                         num_workers=0,
+                                         pin_memory=False,
+                                         collate_fn=dataset.collate_fn)
 
     with torch.no_grad():
-        for imgs, ids in tqdm.tqdm(loader):
+        for (imgs, ids) in tqdm(dataloader):
             outs = inception(imgs.to(device)).permute(0, 2, 3, 1).view(-1, 64, 2048)
             for out, id in zip(outs, ids):
                 out = out.cpu().numpy()
-                id = str(id.item())
+                id = str(id)
                 np.save(os.path.join(features_dir, id), out)
 
 if __name__ == '__main__':
-    args = parser.parse_args()
-    main(args)
+    main()
