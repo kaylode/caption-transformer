@@ -1,4 +1,5 @@
 from .dataset import ImageTextSet
+from .cocoset import CocoDataset
 from torch.utils.data import DataLoader
 from torchtext.legacy.data import BucketIterator
 
@@ -9,8 +10,8 @@ class EqualLengthTextLoader(BucketIterator):
     """
     def __init__(self, 
                 batch_size,
-                input_path,
-                csv_file,
+                root_dir,
+                ann_path,
                 tokenizer,
                 image_size,
                 patch_size,
@@ -19,9 +20,10 @@ class EqualLengthTextLoader(BucketIterator):
                 type,
                 **kwargs):
        
-        self.dataset = ImageTextSet(
-                input_path, csv_file, tokenizer, patch_size=patch_size,
-                image_size=image_size, keep_ratio=keep_ratio,type=type)
+        self.dataset = CocoDataset(
+                root_dir=root_dir, ann_path=ann_path, 
+                tokenizer=tokenizer, image_size=image_size, 
+                keep_ratio=keep_ratio, patch_size=patch_size, type=type)
 
         self.stokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn
@@ -43,8 +45,8 @@ class RawTextLoader(DataLoader):
     """
     def __init__(self, 
                 batch_size,
-                input_path,
-                csv_file,
+                root_dir,
+                ann_path,
                 tokenizer,
                 image_size,
                 patch_size,
@@ -52,9 +54,10 @@ class RawTextLoader(DataLoader):
                 type,
                 **kwargs):
        
-        self.dataset = ImageTextSet(
-                input_path, csv_file, tokenizer, patch_size=patch_size,
-                image_size=image_size, keep_ratio=keep_ratio,type=type)
+        self.dataset = CocoDataset(
+                root_dir=root_dir, ann_path=ann_path, 
+                tokenizer=tokenizer, image_size=image_size, 
+                keep_ratio=keep_ratio, patch_size=patch_size, type=type)
 
         self.tokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn

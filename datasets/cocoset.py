@@ -16,7 +16,7 @@ from torch.utils.data import Dataset, DataLoader
 from .utils import create_masks, make_text_feature_batch, split_patches
 from utils.utils import draw_image_caption
 
-class CocoDataset:
+class CocoDataset(Dataset):
     """
     Coco dataset
     """
@@ -60,10 +60,12 @@ class CocoDataset:
         return anns
 
     def __getitem__(self, index):
+        image_id = self.image_ids[index]
         image_path = self.load_image(index)
         text = self.load_annotations(index)
 
         return {
+            'image_id': image_id,
             'image_path': image_path,
             'text': text,
         }
@@ -79,6 +81,7 @@ class CocoDataset:
     def collate_fn(self, batch):
         
         image_paths = [s['image_path'] for s in batch]
+        image_ids = [s['image_id'] for s in batch]
         imgs = []
         ori_imgs = []
         image_names = []
@@ -110,6 +113,7 @@ class CocoDataset:
         texts_inp = texts_inp.squeeze(-1)
 
         return {
+            'image_ids': image_ids,
             'image_names': image_names,
             'ori_imgs': ori_imgs,
             'image_patches': imgs_patches,

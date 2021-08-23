@@ -3,8 +3,8 @@ settings:
 
   project_name: "flickr30k-caption"    # also the folder name of the dataset that under ./data folder
   image_path: 
-  train_csv:
-  val_csv:
+  train_anns:
+  val_anns:
   #################   TRAINING CONFIG   ###################
   
   model_name:  'catr' 
