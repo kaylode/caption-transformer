@@ -74,11 +74,7 @@ class NLPMetrics(TemplateMetric):
         self.max_samples = max_samples
         self.decimals = decimals
         self.filepath = f'results/text_results.json'
-        self.gt_filepath = f'results/text_gt.json'
-        if self.max_samples is not None:
-            self.image_ids = []
-        else:
-            self.image_ids = None
+        self.gt_filepath = self.dataloader.dataset.ann_path
         self.metrics_list = metrics_list
         self.reset()
 
@@ -87,23 +83,14 @@ class NLPMetrics(TemplateMetric):
             
     def reset(self):
         self.model = None
-        if self.max_samples is not None:
-            self.image_ids = []
-        else:
-            self.image_ids = None
 
     def update(self, model):
         self.model = model
         self.model.eval()
 
     def compute(self):
-        gt_dict = {
-            'images': [],
-            'annotations': []
-        }
         result_dict = []
 
-        image_id = 0
         with torch.no_grad():
             if self.max_samples is not None:
                 total_iter = min(len(self.dataloader)-1, int(self.max_samples/self.dataloader.batch_size))
@@ -114,31 +101,17 @@ class NLPMetrics(TemplateMetric):
                 for idx, batch in enumerate(self.dataloader):
                     if idx > total_iter:
                         break
-
-                    raw_targets = batch['tgt_texts_raw']
+                    
+                    image_ids = batch['image_ids']
                     preds = self.model.inference_step(batch, self.dataloader.tokenizer)
 
-                    for raw_target, pred in zip(raw_targets, preds):
-
-                        gt_dict["images"].append({
-                            'id': image_id
-                        })
-
-                        gt_dict['annotations'].append({
-                            'id': image_id,
-                            'image_id': image_id,
-                            'caption': raw_target
-                        })
+                    for image_id, pred in zip(image_ids, preds):
                             
                         result_dict.append({
                             'image_id': image_id,
                             'caption': pred
                         })
-                        
-                        if self.image_ids is not None:
-                            self.image_ids.append(image_id)
-                            
-                        image_id += 1
+                                                    
                     pbar.update(1)
 
         if not len(result_dict):
@@ -149,17 +122,12 @@ class NLPMetrics(TemplateMetric):
             os.remove(self.filepath)
         json.dump(result_dict, open(self.filepath, 'w'), indent=4)
 
-        # Write gt
-        if os.path.exists(self.gt_filepath):
-            os.remove(self.gt_filepath)
-        json.dump(gt_dict, open(self.gt_filepath, 'w'), indent=4)
-        
         return True
 
     def value(self):
         self.compute()
         stats = _eval(
-            self.gt_filepath, self.filepath, self.image_ids, self.metrics_list)
+            self.gt_filepath, self.filepath, None, self.metrics_list)
 
         # Round up
         for key, value in stats.items():
