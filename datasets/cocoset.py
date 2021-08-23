@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
-from augmentations.transforms import get_resize_augmentation, get_augmentation, MEAN, STD, Denormalize
+from augmentations.transforms import get_resize_augmentation, get_augmentation, Denormalize
 
 from pycocotools.coco import COCO
 from torch.utils.data import Dataset, DataLoader
@@ -123,7 +123,7 @@ class CocoDataset:
 
     def visualize_item(self, index = None, figsize=(15,15)):
         """
-        Visualize an image with its bouding boxes by index
+        Visualize an image with its captions by index
         """
 
         if index is None:
@@ -136,23 +136,26 @@ class CocoDataset:
         
         normalize = False
         if self.transforms is not None:
-            for x in self.transforms.transforms:
+            for x in self.transforms.transforms[1]:
                 if isinstance(x, A.Normalize):
                     normalize = True
                     denormalize = Denormalize(mean=x.mean, std=x.std)
 
         # Denormalize and reverse-tensorize
         if normalize:
-            img = denormalize(img = image)
+            image = denormalize(img = image)
 
-        self.visualize(img, texts, figsize = figsize, img_name= image_name)
+        self.visualize(image, texts, figsize = figsize, img_name= image_name)
 
     def visualize(self, img, texts, figsize=(15,15), img_name=None):
         """
-        Visualize an image with its bouding boxes, input: xyxy
+        Visualize an image with its captions
         """
 
-        text = "\n".join(texts)
+        text = []
+        for i, t in enumerate(texts):
+            text.append(f"{i+1}. {t}")
+        text = "\n".join(text)
         fig = draw_image_caption(img, text, figsize=figsize)
 
         if img_name is not None:
@@ -161,21 +164,23 @@ class CocoDataset:
 
     def count_dict(self, types = 1):
         """
-        Count class frequencies
+        Count text length frequencies
         """
         cnt_dict = {}
         if types == 1: # Text length Frequencies
-            for image_id in self.image_ids:
+            for image_id in range(len(self.image_ids)):
                 texts = self.load_annotations(image_id, return_all=True)
                 for text in texts:
                     text_length = len(text)
+                    if text_length not in cnt_dict.keys():
+                        cnt_dict[text_length] = 0
                     cnt_dict[text_length] += 1
         
         return cnt_dict
 
     def plot(self, figsize = (8,8), types = ["length"]):
         """
-        Plot classes distribution
+        Plot distribution
         """
         ax = plt.figure(figsize = figsize)
         num_plots = len(types)
@@ -186,7 +191,7 @@ class CocoDataset:
             plot_idx +=1
             cnt_dict = self.count_dict(types = 1)
             plt.title("Total texts: "+ str(sum(list(cnt_dict.values()))))
-            bar1 = plt.bar(list(cnt_dict.keys()), list(cnt_dict.values()), color=[np.random.rand(3,) for i in range(len(self.classes))])
+            bar1 = plt.bar(list(cnt_dict.keys()), list(cnt_dict.values()), color=[np.random.rand(3,) for i in range(len(cnt_dict.keys()))])
             for rect in bar1:
                 height = rect.get_height()
                 plt.text(rect.get_x() + rect.get_width()/2.0, height, '%d' % int(height), ha='center', va='bottom')
