@@ -203,6 +203,6 @@ class CocoDataset(Dataset):
         plt.show()
 
     def __str__(self): 
-        s1 = "Number of images: " + str(self.image_ids) + '\n'
+        s1 = "Number of images: " + str(len(self.image_ids)) + '\n'
         s2 = "Number of texts: " + str(len(self.coco.getAnnIds())) + '\n'
         return s1 + s2
