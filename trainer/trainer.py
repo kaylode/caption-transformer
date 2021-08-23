@@ -226,8 +226,6 @@ class Trainer():
         }
         self.model.eval()
         for idx, batch in enumerate(self.valloader):
-            if idx > 8:
-                break
 
             raw_targets = batch['tgt_texts_raw']
             ori_imgs = batch['ori_imgs']
@@ -245,6 +243,7 @@ class Trainer():
 
                 tag = f"{image_name}"
                 self.logger.write_image(tag, fig, self.epoch)
+            break
             
         pd.DataFrame(result).to_csv('./samples/sample.csv', index=False)
         
