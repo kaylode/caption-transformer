@@ -20,7 +20,13 @@ class CocoDataset(Dataset):
     """
     Coco dataset
     """
-    def __init__(self, root_dir, ann_path, tokenizer, image_size=[512,512], keep_ratio=False, patch_size=16, type='train'):
+    def __init__(self, 
+            root_dir, ann_path, 
+            tokenizer, image_size=[512,512], 
+            keep_ratio=False, patch_size=16, 
+            type='train', cache_dir=None):
+
+        self.cache_dir = cache_dir
         self.root_dir = root_dir
         self.ann_path = ann_path
         self.image_size = image_size
@@ -82,18 +88,29 @@ class CocoDataset(Dataset):
         
         image_paths = [s['image_path'] for s in batch]
         image_ids = [s['image_id'] for s in batch]
-        imgs = []
-        ori_imgs = []
-        image_names = []
-        for image_path in image_paths:
-            image_names.append(os.path.basename(image_path))
-            image, ori_img = self.load_augment(image_path)
-            imgs.append(image)
-            ori_imgs.append(ori_img)
-        imgs = torch.stack(imgs)
 
-        imgs_patches = split_patches(imgs, self.image_size[0], self.image_size[1], P=16)
-        image_masks = torch.ones(imgs_patches.shape[:-1])
+        if not self.cache_dir:
+            imgs = []
+            ori_imgs = []
+            image_names = []
+            for image_path in image_paths:
+                image_names.append(os.path.basename(image_path))
+                image, ori_img = self.load_augment(image_path)
+                imgs.append(image)
+                ori_imgs.append(ori_img)
+            imgs = torch.stack(imgs)
+            feats = split_patches(imgs, self.image_size[0], self.image_size[1], P=16)
+            image_masks = torch.ones(feats.shape[:-1])
+        else:
+            npy_paths = [s[:-4]+'.npy' for s in image_ids]
+            npy_paths = [os.path.join(self.cache_dir, s) for s in npy_paths]
+            feats = []
+            for npy_path in npy_paths:
+                feats.append(np.load(npy_path, allow_pickle=True)) # [64, 2048]
+            feats = np.stack(feats)
+            feats = torch.from_numpy(feats)
+            image_masks = torch.ones(feats.shape[:-1])
+
         texts = [s['text'] for s in batch]
         
         tokens = self.tokenizer(texts, truncation=True)
@@ -116,7 +133,7 @@ class CocoDataset(Dataset):
             'image_ids': image_ids,
             'image_names': image_names,
             'ori_imgs': ori_imgs,
-            'image_patches': imgs_patches,
+            'image_patches': feats,
             'image_masks': image_masks.long(),
             'tgt_texts_raw': texts,
             'texts_inp': texts_inp.long(),

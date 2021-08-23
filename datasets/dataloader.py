@@ -17,10 +17,12 @@ class EqualLengthTextLoader(BucketIterator):
                 keep_ratio,
                 device,
                 type,
+                cache_dir=None,
                 **kwargs):
        
         self.dataset = CocoDataset(
                 root_dir=root_dir, ann_path=ann_path, 
+                cache_dir=cache_dir,
                 tokenizer=tokenizer, image_size=image_size, 
                 keep_ratio=keep_ratio, patch_size=patch_size, type=type)
 
@@ -51,10 +53,12 @@ class RawTextLoader(DataLoader):
                 patch_size,
                 keep_ratio,
                 type,
+                cache_dir=None,
                 **kwargs):
        
         self.dataset = CocoDataset(
                 root_dir=root_dir, ann_path=ann_path, 
+                cache_dir=cache_dir,
                 tokenizer=tokenizer, image_size=image_size, 
                 keep_ratio=keep_ratio, patch_size=patch_size, type=type)
 
