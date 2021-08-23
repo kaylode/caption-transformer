@@ -66,9 +66,9 @@ def get_augmentation(_type='train'):
 
     transforms_list = [
 
-        A.OneOf([
-            A.HorizontalFlip(p=flip_config['hflip']),
-        ], p=flip_config['prob']),
+        
+        A.HorizontalFlip(p=flip_config['hflip']),
+        
 
         A.OneOf([
             A.HueSaturationValue(
@@ -86,9 +86,7 @@ def get_augmentation(_type='train'):
             A.IAASharpen(p=quality_config['sharpen']), 
             A.Compose([
                 A.FromFloat(dtype='uint8', p=1),
-                A.OneOf([
-                    A.CLAHE(clip_limit=2.0, tile_grid_size=(8,8), p=quality_config['clahe']),
-                ], p=0.7),
+                A.CLAHE(clip_limit=2.0, tile_grid_size=(8,8), p=quality_config['clahe']),
                 A.ToFloat(p=1),
             ])           
         ], p=quality_config['prob']),
