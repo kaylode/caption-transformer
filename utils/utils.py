@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import gdown
 import matplotlib.pyplot as plt 
 
