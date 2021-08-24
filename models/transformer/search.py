@@ -16,7 +16,7 @@ def convert_ids_to_toks(token_ids, tokenizer):
         tok_words = tokenizer.convert_ids_to_tokens(tok_ids)
         result_toks = []
         for word in tok_words:
-            if word == tokenizer.eos_token or word == tokenizer.sep_token:
+            if word == tokenizer.sep_token: #word == tokenizer.eos_token 
                 break
             if word not in special_tokens:
                 result_toks.append(word)
@@ -146,7 +146,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         Encode texts and initialize beam
         """
         batch_size = src_text.shape[0]
-        start_symbol = tgt_tokenizer.bos_token_id or tokenizer.cls_token_id
+        start_symbol = tgt_tokenizer.cls_token_id #tgt_tokenizer.bos_token_id
         
         # Encoded inputs
         memory = model.encoder(src_text, src_mask)
