@@ -18,7 +18,7 @@ class PositionwiseFeedForward(nn.Module):
         """
         Apply RELU and dropout between two layers
         """
-        return self.w_2(self.dropout(F.relu(self.w_1(x))))
+        return self.w_2(self.dropout(F.gelu(self.w_1(x))))
 
 def draw_attention_map(input, target, model, show_fig=True, save_fig=None, return_figs=False):
     """
