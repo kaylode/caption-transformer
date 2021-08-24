@@ -1,7 +1,7 @@
 settings:
   #################   DATASET CONFIG   ###################
 
-  project_name: "flickr30k-caption"    # also the folder name of the dataset that under ./data folder
+  project_name: "flickr30k-caption"    
   image_path: 
   train_anns:
   val_anns:

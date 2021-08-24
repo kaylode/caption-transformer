@@ -8,7 +8,7 @@ parser.add_argument('--save_interval', type=int, default=1000, help='Number of s
 parser.add_argument('--resume', type=str, default=None,
                     help='whether to load weights from a checkpoint, set None to initialize')
 parser.add_argument('--saved_path', type=str, default='./weights')
-parser.add_argument('--cache_dir', type=str, default=None)
+parser.add_argument('--cache_dir', type=str, default=None, help='Cache directory for pre-computed input features')
 parser.add_argument('--no_visualization', action='store_false', help='whether to visualize box to ./sample when validating (for debug), default=on')
 
 torch.backends.cudnn.benchmark = True
@@ -95,7 +95,8 @@ def train(args, config):
     print(f'Training with {num_gpus} gpu(s): ')
     print(devices_info)
     print(f"Start training at [{start_epoch}|{start_iter}]")
-    
+    print(f"Current best BLEU: {best_value}")
+
     trainer.fit(start_epoch = start_epoch, start_iter = start_iter, num_epochs=config.num_epochs, print_per_iter=args.print_per_iter)
 
     
