@@ -88,13 +88,15 @@ class CocoDataset(Dataset):
         
         image_paths = [s['image_path'] for s in batch]
         image_ids = [s['image_id'] for s in batch]
+        
+        image_names = []
+        ori_imgs = []
+        for image_path in image_paths:
+            image_names.append(os.path.basename(image_path))
 
         if not self.cache_dir:
             imgs = []
-            ori_imgs = []
-            image_names = []
             for image_path in image_paths:
-                image_names.append(os.path.basename(image_path))
                 image, ori_img = self.load_augment(image_path)
                 imgs.append(image)
                 ori_imgs.append(ori_img)
@@ -102,7 +104,7 @@ class CocoDataset(Dataset):
             feats = split_patches(imgs, self.image_size[0], self.image_size[1], P=16)
             image_masks = torch.ones(feats.shape[:-1])
         else:
-            npy_paths = [s[:-4]+'.npy' for s in image_ids]
+            npy_paths = [f'{s}.npy' for s in image_ids]
             npy_paths = [os.path.join(self.cache_dir, s) for s in npy_paths]
             feats = []
             for npy_path in npy_paths:

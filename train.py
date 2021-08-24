@@ -8,6 +8,7 @@ parser.add_argument('--save_interval', type=int, default=1000, help='Number of s
 parser.add_argument('--resume', type=str, default=None,
                     help='whether to load weights from a checkpoint, set None to initialize')
 parser.add_argument('--saved_path', type=str, default='./weights')
+parser.add_argument('--cache_dir', type=str, default=None)
 parser.add_argument('--no_visualization', action='store_false', help='whether to visualize box to ./sample when validating (for debug), default=on')
 
 torch.backends.cudnn.benchmark = True
@@ -23,6 +24,11 @@ def train(args, config):
     
     trainset, valset, trainloader, valloader = get_dataset_and_dataloader(config)
     
+    if args.cache_dir:
+        print("Using cache features")
+        trainset.cache_dir = args.cache_dir
+        valset.cache_dir = args.cache_dir
+
     net = get_transformer_model(
         patches_dim=trainset.get_patch_dim(),
         trg_vocab=trainset.tokenizer.vocab_size)
