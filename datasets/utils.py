@@ -22,7 +22,7 @@ def split_patches(imgs, H, W, P):
     batch_patches = torch.stack(batch_patches, dim=0)
     return batch_patches  
 
-def make_text_feature_batch(features,  pad_token=0):
+def make_feature_batch(features,  pad_token=0):
     """
     List of features,
     each feature is [K, model_dim] where K is number of objects of each image

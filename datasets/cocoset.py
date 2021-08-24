@@ -13,7 +13,7 @@ from augmentations.transforms import get_resize_augmentation, get_augmentation, 
 from pycocotools.coco import COCO
 from torch.utils.data import Dataset, DataLoader
 
-from .utils import create_masks, make_text_feature_batch, split_patches
+from .utils import create_masks, make_feature_batch, split_patches
 from utils.utils import draw_image_caption
 
 class CocoDataset(Dataset):
@@ -109,8 +109,11 @@ class CocoDataset(Dataset):
             feats = []
             for npy_path in npy_paths:
                 feats.append(np.load(npy_path, allow_pickle=True)) # [64, 2048]
-            feats = np.stack(feats)
-            feats = torch.from_numpy(feats)
+            try:
+                feats = np.stack(feats)
+                feats = torch.from_numpy(feats)
+            except:
+                feats = make_feature_batch(feats, pad_token=0)
             image_masks = torch.ones(feats.shape[:-1])
 
         texts = [s['text'] for s in batch]
@@ -118,7 +121,7 @@ class CocoDataset(Dataset):
         tokens = self.tokenizer(texts, truncation=True)
         tokens = [np.array(i) for i in tokens['input_ids']]
 
-        texts_ = make_text_feature_batch(
+        texts_ = make_feature_batch(
             tokens, pad_token=self.tokenizer.pad_token_id)
         
         texts_inp = texts_[:, :-1]
