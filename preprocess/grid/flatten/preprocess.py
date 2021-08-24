@@ -38,10 +38,10 @@ class CocoDataset(Dataset):
         return image_path
 
     def __getitem__(self, index):
-        image_id = self.image_ids[index]
         image_path = self.load_image(index)
+        image_name = os.path.basename(image_path)
         image = self.load_augment(image_path)
-        return image, image_id
+        return image, image_name
 
     def load_augment(self, image_path):
         ori_img = cv2.imread(image_path)
@@ -53,9 +53,9 @@ class CocoDataset(Dataset):
 
     def collate_fn(self, batch):
         imgs = [s[0] for s in batch]
-        ids = [s[1] for s in batch]
+        image_names = [s[1] for s in batch]
 
-        return torch.stack(imgs), ids
+        return torch.stack(imgs), image_names
 
 
 def split_patches(img, H, W, P):
@@ -78,10 +78,10 @@ def split_patches(img, H, W, P):
 
 def main():
 
-    features_dir = "/content/data/features"
+    features_dir = "./flatten_features"
     dataset = CocoDataset(
-        root_dir='/content/data/flickr30k/images',
-        ann_path='/content/data/flickr30k/annotations/train.json',
+        root_dir='./images',
+        ann_path='./annotations/train.json',
         image_size=[384,384], keep_ratio=False)
 
     dataloader = DataLoader(
@@ -91,11 +91,10 @@ def main():
         pin_memory=False,
         collate_fn=dataset.collate_fn)
 
-    for (imgs, ids) in tqdm(dataloader):
-        for img, id in zip(imgs, ids):
+    for (imgs, image_names) in tqdm(dataloader):
+        for img, image_name in zip(imgs, image_names):
             feats = split_patches(img, 384, 384, P=16)
-            id = str(id)
-            np.save(os.path.join(features_dir, id), feats)
+            np.save(os.path.join(features_dir, image_name[:-4]), feats)
 
 if __name__ == '__main__':
     main()
