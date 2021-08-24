@@ -104,7 +104,7 @@ class CocoDataset(Dataset):
             feats = split_patches(imgs, self.image_size[0], self.image_size[1], P=16)
             image_masks = torch.ones(feats.shape[:-1])
         else:
-            npy_paths = [f'{s}.npy' for s in image_ids]
+            npy_paths = [s[:-4] + '.npy' for s in image_names]
             npy_paths = [os.path.join(self.cache_dir, s) for s in npy_paths]
             feats = []
             for npy_path in npy_paths:
