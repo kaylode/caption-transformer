@@ -1,5 +1,4 @@
 from .transformer import Transformer
-from .seq2seq import Seq2Seq
 from .captioning import Captioning
 
 def get_transformer_model(patches_dim, trg_vocab):
