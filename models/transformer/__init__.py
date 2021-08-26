@@ -26,10 +26,10 @@ class Encoder(nn.Module):
     :output:
         encoded embeddings shape [batch * input length * model_dim]
     """
-    def __init__(self, patches_dim, d_model, d_ff, N, heads, dropout):
+    def __init__(self, img_size, patch_size, d_model, d_ff, N, heads, dropout, num_channels=3):
         super().__init__()
         self.N = N
-        self.embed = FeatureProjection(patches_dim, d_model)
+        self.embed = PatchEmbedding(img_size=img_size, patch_size=patch_size, in_chans=num_channels, embed_dim=d_model)
         self.pe = PositionalEncoding(d_model, dropout_rate=dropout)
         self.layers = get_clones(EncoderLayer(d_model, d_ff, heads, dropout), N)
         self.norm = LayerNorm(d_model)
