@@ -15,16 +15,3 @@ def get_transformer_model(patches_dim, trg_vocab):
     }
 
     return Transformer(**transformer_config)
-
-def get_lstm_model(src_vocab, trg_vocab):
-    lstm_config = {
-            'src_vocab':        src_vocab, 
-            'trg_vocab':        trg_vocab, 
-            "embed_dim":        512, 
-            "hidden_dim":       1024,
-            "num_layers":       1,
-            'bidirectional':    False,
-            'dropout' :         None
-        }
-
-    return Seq2Seq(**lstm_config)

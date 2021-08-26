@@ -1,6 +1,6 @@
 import copy
 import torch.nn as nn
-from .embedding import Embeddings, PositionalEncoding
+from .embedding import Embeddings, PositionalEncoding, PatchEmbedding
 from .projection import FeatureProjection
 from .layers import EncoderLayer, DecoderLayer
 from .norm import LayerNorm
