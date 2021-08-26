@@ -1,7 +1,6 @@
 import copy
 import torch.nn as nn
 from .embedding import Embeddings, PositionalEncoding, PatchEmbedding
-from .projection import FeatureProjection
 from .layers import EncoderLayer, DecoderLayer
 from .norm import LayerNorm
 from .utils import draw_attention_map
@@ -71,7 +70,8 @@ class Transformer(nn.Module):
     """
     Transformer model
     :input:
-        patches_dim:   size of patches
+        img_size:      size of image
+        patch_size:    size of patch
         trg_vocab:     size of target vocab
         d_model:       embeddings dim
         d_ff:          feed-forward dim
@@ -81,10 +81,10 @@ class Transformer(nn.Module):
     :output:
         next words probability shape [batch * input length * vocab_dim]
     """
-    def __init__(self, patches_dim, trg_vocab, d_model, d_ff, N_enc, N_dec, heads, dropout):
+    def __init__(self, img_size, patch_size, trg_vocab, d_model, d_ff, N_enc, N_dec, heads, dropout, num_channels=3):
         super().__init__()
         self.name = "Transformer"
-        self.encoder = Encoder(patches_dim, d_model, d_ff, N_enc, heads, dropout)
+        self.encoder = Encoder(img_size, patch_size, d_model, d_ff, N_enc, heads, dropout, num_channels=num_channels)
         self.decoder = Decoder(trg_vocab, d_model, d_ff, N_dec, heads, dropout)
         self.out = nn.Linear(d_model, trg_vocab)
         self.init_params()
