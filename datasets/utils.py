@@ -1,27 +1,6 @@
 import torch
 import numpy as np
 
-
-def split_patches(imgs, H, W, P):
-    """
-    Split image into patches. Apply for batches
-    """
-    assert int(W*H / (P*P)) * (P*P) == W*H, "Not divisible"
-    num_patches_w = int(W/P)
-    num_patches_h = int(H/P)
-    num_channels = imgs.shape[1]
-    batch_patches = []
-
-    for img in imgs:
-        patches = []
-        for i in range(1, num_patches_h+1):
-            for j in range(1, num_patches_w+1):
-                patches.append(img[:, P*(i-1):P*i, P*(j-1):P*j].clone())
-        patches = torch.stack(patches).reshape(-1, num_channels*P*P)
-        batch_patches.append(patches)
-    batch_patches = torch.stack(batch_patches, dim=0)
-    return batch_patches  
-
 def make_feature_batch(features,  pad_token=0):
     """
     List of features,

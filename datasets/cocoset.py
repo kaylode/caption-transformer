@@ -100,9 +100,9 @@ class CocoDataset(Dataset):
                 image, ori_img = self.load_augment(image_path)
                 imgs.append(image)
                 ori_imgs.append(ori_img)
-            imgs = torch.stack(imgs)
-            feats = split_patches(imgs, self.image_size[0], self.image_size[1], P=16)
-            image_masks = torch.ones(feats.shape[:-1])
+            feats = torch.stack(imgs)
+            mask_shapes = int((self.image_size[0] / self.patch_size) **2)
+            image_masks = torch.ones((feats.shape[0], mask_shapes))
         else:
             npy_paths = [s[:-4] + '.npy' for s in image_names]
             npy_paths = [os.path.join(self.cache_dir, s) for s in npy_paths]
