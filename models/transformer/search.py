@@ -82,7 +82,7 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
     
     model.eval()
     batch_size = src.shape[0]
-    start_symbol = tokenizer.bos_token_id or tokenizer.cls_token_id
+    start_symbol = tokenizer.cls_token_id
     device = next(model.parameters()).device
     if max_len is None:
         max_len = src.shape[-1]

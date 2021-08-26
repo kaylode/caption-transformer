@@ -78,8 +78,8 @@ class CocoDataset(Dataset):
 
     def load_augment(self, image_path):
         ori_img = cv2.imread(image_path)
-        image = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
-        image = image.astype(np.float32)
+        ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+        image = ori_img.astype(np.float32)
         image /= 255.0
         image = self.transforms(image=image)['image']
         return image, ori_img

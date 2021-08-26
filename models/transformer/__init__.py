@@ -102,7 +102,7 @@ class Transformer(nn.Module):
     def predict(
         self, src_inputs, src_masks, 
         tokenizer, max_len=None, 
-        top_k = 100, top_p=0.9, temperature = 0.9,
+        top_k = 5, top_p=0.9, temperature = 0.9,
         *args, **kwargs):
 
         """
@@ -110,23 +110,23 @@ class Transformer(nn.Module):
         """
 
         if max_len is None:
-            max_len = src_inputs.shape[-1]+32
+            max_len = src_inputs.shape[-1]
 
         # sampling_search, beam_search
-        # outputs = sampling_search(
-        #     self, 
-        #     src=src_inputs, 
-        #     src_mask=src_masks, 
-        #     max_len=max_len, 
-        #     top_k = top_k, top_p=top_p, 
-        #     temperature = temperature,
-        #     tokenizer=tokenizer)
-
-        outputs = beam_search(
+        outputs = sampling_search(
             self, 
             src=src_inputs, 
-            src_mask=src_masks,
-            tokenizer=tokenizer, 
-            max_len=max_len, k=3, alpha=0.7)
+            src_mask=src_masks, 
+            max_len=max_len, 
+            top_k = top_k, top_p=top_p, 
+            temperature = temperature,
+            tokenizer=tokenizer)
+
+        # outputs = beam_search(
+        #     self, 
+        #     src=src_inputs, 
+        #     src_mask=src_masks,
+        #     tokenizer=tokenizer, 
+        #     max_len=max_len, k=3, alpha=0.7)
 
         return outputs

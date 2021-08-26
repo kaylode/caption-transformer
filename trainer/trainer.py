@@ -221,6 +221,7 @@ class Trainer():
             os.mkdir('./samples')
 
         result = {
+            'image_name': [],
             'gt': [],
             'pred': []
         }

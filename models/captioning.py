@@ -52,7 +52,8 @@ class Captioning(BaseModel):
         outputs = self.model.predict(
             src_inputs = src_inputs,
             src_masks = src_masks, 
-            tokenizer = tgt_tokenizer)
+            tokenizer = tgt_tokenizer,
+            max_len=64)
 
         return outputs  
 
