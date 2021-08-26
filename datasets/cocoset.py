@@ -13,7 +13,7 @@ from augmentations.transforms import get_resize_augmentation, get_augmentation, 
 from pycocotools.coco import COCO
 from torch.utils.data import Dataset, DataLoader
 
-from .utils import create_masks, make_feature_batch, split_patches
+from .utils import create_masks, make_feature_batch
 from utils.utils import draw_image_caption
 
 class CocoDataset(Dataset):

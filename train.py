@@ -30,7 +30,6 @@ def train(args, config):
         valset.cache_dir = args.cache_dir
 
     net = get_transformer_model(
-        img_size=config.image_size[0],
         patch_size=config.patch_size,
         trg_vocab=trainset.tokenizer.vocab_size)
 
