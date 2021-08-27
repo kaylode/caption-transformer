@@ -1,4 +1,5 @@
 import copy
+import torch
 import torch.nn as nn
 from .embedding import Embeddings, PositionalEncoding, PatchEmbedding
 from .layers import EncoderLayer, DecoderLayer
@@ -60,9 +61,10 @@ class Encoder(nn.Module):
                 x = self.layers[i](x, mask)
             x = self.norm(x)
         else:
-            x = self.vit.forward_features(src)
-            if len(x) == 2:
-                x = x[0]
+            x = self.vit.patch_embed(src)
+            x = self.vit.pos_drop(x + self.vit.pos_embed)
+            x = self.vit.blocks(x)
+            x = self.vit.norm(x)
         return x
 
 class Decoder(nn.Module):
