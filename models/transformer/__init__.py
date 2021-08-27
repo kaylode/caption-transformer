@@ -61,7 +61,8 @@ class Encoder(nn.Module):
             x = self.norm(x)
         else:
             x = self.vit.forward_features(src)
-            x = (x[:, 0] + x[:, 1]) / 2
+            if len(x) == 2:
+                x = x[0]
         return x
 
 class Decoder(nn.Module):
