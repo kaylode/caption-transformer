@@ -50,8 +50,13 @@ class Encoder(nn.Module):
             self.layers = get_clones(EncoderLayer(d_model, d_ff, heads, dropout), N)
             self.norm = LayerNorm(d_model)
         else:
-            self.vit = get_pretrained_encoder()
-            self.embed_dim = self.vit.embed_dim 
+            vit = get_pretrained_encoder()
+            self.embed_dim = vit.embed_dim 
+            self.patch_embed = vit.patch_embed
+            self.pos_embed = vit.pos_embed
+            self.pos_drop = vit.pos_drop
+            self.blocks = vit.blocks
+            self.norm = vit.norm
         
     def forward(self, src, mask):
         if not self.pretrained:
@@ -61,10 +66,10 @@ class Encoder(nn.Module):
                 x = self.layers[i](x, mask)
             x = self.norm(x)
         else:
-            x = self.vit.patch_embed(src)
-            x = self.vit.pos_drop(x + self.vit.pos_embed)
-            x = self.vit.blocks(x)
-            x = self.vit.norm(x)
+            x = self.patch_embed(src)
+            x = self.pos_drop(x + self.pos_embed[:, 2:])
+            x = self.blocks(x)
+            x = self.norm(x)
         return x
 
 class Decoder(nn.Module):
