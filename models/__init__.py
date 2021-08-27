@@ -12,7 +12,8 @@ def get_transformer_model(patch_size, trg_vocab):
         "N_dec":            6,
         "heads":            8,
         "dropout":          0.3,
-        "num_channels":     3
+        "num_channels":     3,
+        'pretrained_encoder': True
     }
 
     return Transformer(**transformer_config)

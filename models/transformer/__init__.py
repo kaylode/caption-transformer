@@ -15,13 +15,13 @@ def get_clones(module, N):
 def get_pretrained_encoder(model_name='base224'):
     import timm
     if model_name == 'tiny224':
-        model = timm.create_model('vit_deit_tiny_distilled_patch16_224', pretrained=True)
+        model = timm.create_model('deit_tiny_distilled_patch16_224', pretrained=True)
     elif model_name == 'small224':
-        model = timm.create_model('vit_deit_small_distilled_patch16_224', pretrained=True)
+        model = timm.create_model('deit_small_distilled_patch16_224', pretrained=True)
     elif model_name == 'base224':
-        model = timm.create_model('vit_deit_base_distilled_patch16_224', pretrained=True)
+        model = timm.create_model('deit_base_distilled_patch16_224', pretrained=True)
     elif model_name == 'base384':
-        model = timm.create_model('vit_deit_base_distilled_patch16_384', pretrained=True)
+        model = timm.create_model('deit_base_distilled_patch16_384', pretrained=True)
     return model
 
 class Encoder(nn.Module):
@@ -50,6 +50,7 @@ class Encoder(nn.Module):
             self.norm = LayerNorm(d_model)
         else:
             self.vit = get_pretrained_encoder()
+            self.embed_dim = self.vit.embed_dim 
         
     def forward(self, src, mask):
         if not self.pretrained:
@@ -60,7 +61,7 @@ class Encoder(nn.Module):
             x = self.norm(x)
         else:
             x = self.vit.forward_features(src)
-
+            x = (x[:, 0] + x[:, 1]) / 2
         return x
 
 class Decoder(nn.Module):
@@ -104,10 +105,13 @@ class Transformer(nn.Module):
     :output:
         next words probability shape [batch * input length * vocab_dim]
     """
-    def __init__(self, patch_size, trg_vocab, d_model, d_ff, N_enc, N_dec, heads, dropout, num_channels=3):
+    def __init__(self, patch_size, trg_vocab, d_model=768, d_ff=3072, N_enc=12, N_dec=4, heads=12, dropout=0.2, num_channels=3, pretrained_encoder=True):
         super().__init__()
         self.name = "Transformer"
-        self.encoder = Encoder(patch_size, d_model, d_ff, N_enc, heads, dropout, num_channels=num_channels)
+        self.encoder = Encoder(patch_size, d_model, d_ff, N_enc, heads, dropout, num_channels=num_channels, pretrained=pretrained_encoder)
+        if pretrained_encoder:
+            # Override decoder hidden dim if use pretrained encoder
+            d_model = self.encoder.embed_dim
         self.decoder = Decoder(trg_vocab, d_model, d_ff, N_dec, heads, dropout)
         self.out = nn.Linear(d_model, trg_vocab)
         self.init_params()
