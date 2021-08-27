@@ -2,7 +2,6 @@ import math
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from timm.models.layers import to_2tuple
 
 class PatchEmbedding(nn.Module):
     """

@@ -12,6 +12,18 @@ def get_clones(module, N):
     """
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
+def get_pretrained_encoder(model_name='base224'):
+    import timm
+    if model_name == 'tiny224':
+        model = timm.create_model('vit_deit_tiny_distilled_patch16_224', pretrained=True)
+    elif model_name == 'small224':
+        model = timm.create_model('vit_deit_small_distilled_patch16_224', pretrained=True)
+    elif model_name == 'base224':
+        model = timm.create_model('vit_deit_base_distilled_patch16_224', pretrained=True)
+    elif model_name == 'base384':
+        model = timm.create_model('vit_deit_base_distilled_patch16_384', pretrained=True)
+    return model
+
 class Encoder(nn.Module):
     """
     Core encoder is a stack of N EncoderLayers
@@ -25,19 +37,31 @@ class Encoder(nn.Module):
     :output:
         encoded embeddings shape [batch * input length * model_dim]
     """
-    def __init__(self, patch_size, d_model, d_ff, N, heads, dropout, num_channels=3):
+    def __init__(self, patch_size, d_model, d_ff, N, heads, dropout, num_channels=3, pretrained=True):
         super().__init__()
         self.N = N
-        self.embed = PatchEmbedding(patch_size=patch_size, in_chans=num_channels, embed_dim=d_model)
-        self.pe = PositionalEncoding(d_model, dropout_rate=dropout)
-        self.layers = get_clones(EncoderLayer(d_model, d_ff, heads, dropout), N)
-        self.norm = LayerNorm(d_model)
+
+        self.pretrained = pretrained
+
+        if not pretrained:
+            self.embed = PatchEmbedding(patch_size=patch_size, in_chans=num_channels, embed_dim=d_model)
+            self.pe = PositionalEncoding(d_model, dropout_rate=dropout)
+            self.layers = get_clones(EncoderLayer(d_model, d_ff, heads, dropout), N)
+            self.norm = LayerNorm(d_model)
+        else:
+            self.vit = get_pretrained_encoder()
+        
     def forward(self, src, mask):
-        x = self.embed(src)
-        x = self.pe(x)
-        for i in range(self.N):
-            x = self.layers[i](x, mask)
-        return self.norm(x)
+        if not self.pretrained:
+            x = self.embed(src)
+            x = self.pe(x)
+            for i in range(self.N):
+                x = self.layers[i](x, mask)
+            x = self.norm(x)
+        else:
+            x = self.vit.forward_features(src)
+
+        return x
 
 class Decoder(nn.Module):
     """
