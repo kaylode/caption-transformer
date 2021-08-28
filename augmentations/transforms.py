@@ -5,14 +5,8 @@ from albumentations.pytorch.transforms import ToTensorV2
 from .custom import CustomCutout
 from configs import Config
 
-# FOR BEST RESULTS, CHOOSE THE APPRORIATE NUMBERS
-# If use EfficientDet, use these numbers
 MEAN = [0.485, 0.456, 0.406]
 STD = [0.229, 0.224, 0.225]
-
-# If use YOLO, use these numbers
-# MEAN = [0.0, 0.0, 0.0]
-# STD = [1.0, 1.0, 1.0]
 
 class Denormalize(object):
     """
@@ -66,21 +60,12 @@ def get_augmentation(_type='train'):
 
     transforms_list = [
 
-        
         A.HorizontalFlip(p=flip_config['hflip']),
-        
-
-        A.OneOf([
-            A.HueSaturationValue(
-                hue_shift_limit=color_config['hue'], 
-                sat_shift_limit=color_config['saturation'], 
-                val_shift_limit=color_config['value'], 
-                p=0.5),
-            A.RandomBrightnessContrast(
-                brightness_limit=color_config['brightness'], 
-                contrast_limit=color_config['contrast'], 
-                p=0.5)
-        ], p=color_config['prob']),
+    
+        A.RandomBrightnessContrast(
+            brightness_limit=color_config['brightness'], 
+            contrast_limit=color_config['contrast'], 
+            p=0.5),
 
         A.OneOf([
             A.IAASharpen(p=quality_config['sharpen']), 
