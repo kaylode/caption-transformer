@@ -59,3 +59,8 @@ def draw_attention_map(input, target, model, show_fig=True, save_fig=None, retur
     
     if return_figs:
         return figs
+
+def init_xavier(model):
+    for p in model.parameters():
+        if p.dim() > 1:
+            nn.init.xavier_uniform_(p)
