@@ -92,7 +92,7 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
 
     with torch.no_grad():
         # Encoder output
-        memory = model.encoder(src, src_mask)
+        memory = model.encoder(src)
     
         for i in range(max_len-1):
 
@@ -149,7 +149,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         start_symbol = tgt_tokenizer.cls_token_id #tgt_tokenizer.bos_token_id
         
         # Encoded inputs
-        memory = model.encoder(src_text, src_mask)
+        memory = model.encoder(src_text)
 
         # Result tokens
         ys = torch.ones(batch_size, 1).fill_(start_symbol).long()
