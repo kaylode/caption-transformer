@@ -23,7 +23,7 @@ def main(args, config):
     metric = NLPMetrics(valloader, metrics_list=['bleu', "meteor", 'rouge', 'cider', 'spice'])
 
     net = get_transformer_model(
-        patches_dim=trainset.get_patch_dim(),
+        patch_size=config.patch_size,
         trg_vocab=trainset.tokenizer.vocab_size)
 
     net.eval()
