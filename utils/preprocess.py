@@ -121,6 +121,16 @@ class SentenceTokenizer:
     def __call__(self, x):
         return sent_tokenize(x)
 
+class WordTokenizer:
+    """
+    Split sentences into words
+    """
+    def __init__(self) -> None:
+        pass
+
+    def __call__(self, x):
+        return word_tokenize(x)
+
 class Preprocess:
     """
     Text preprocessing
@@ -154,6 +164,7 @@ if __name__ =='__main__':
         Lower(),
         Stemmer(),
         RemoveEmoji(),
+        WordTokenizer()
     ])
 
     print(prep(text))
