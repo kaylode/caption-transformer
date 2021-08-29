@@ -246,7 +246,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         highest_prob_sent = ys_k[highest_prob_id]
         token_ids_k = highest_prob_sent.detach().cpu().numpy()
         results_k = convert_ids_to_toks(token_ids_k, tokenizer)   
-        results.append(results_k)
+        results.append(results_k[0])
 
     return results
 
