@@ -7,7 +7,7 @@ def get_transformer_model(patch_size, trg_vocab):
         'patch_size':       patch_size,
         'trg_vocab':        trg_vocab, 
         "d_model":          512, 
-        "d_ff":             1024,
+        "d_ff":             3072,
         "N_enc":            6,
         "N_dec":            6,
         "heads":            8,
