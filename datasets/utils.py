@@ -1,4 +1,6 @@
+import csv
 import torch
+import base64
 import numpy as np
 
 def make_feature_batch(features,  pad_token=0):
@@ -40,3 +42,47 @@ def create_masks(features, pad_token=0, is_tgt_masking=False):
         masks = masks.unsqueeze(1) & nopeak_mask
     
     return masks    
+
+def efficient_iterrows(filename):
+    """
+    Initiate generator from tsv file in chunks
+    """
+    with open(filename, "r") as csvfile:
+        datareader = csv.reader(csvfile, delimiter='\t')
+        # print(next(datareader))
+        yield next(datareader)  # yield the header row
+        for row in datareader:
+            yield row
+
+def np_from_b64(b64_str, dtype):
+    """
+    Decode base64 from numpy array
+    """
+    decoded_arr = base64.b64decode(b64_str.encode())
+    decoded_arr = np.frombuffer(decoded_arr, dtype=dtype)
+    return decoded_arr
+
+def decode_tsv(filename):
+    """
+    Decode tsv file into features dataset
+    TSV generated from: https://github.com/airsplay/py-bottom-up-attention/blob/master/demo/detectron2_mscoco_proposal_maxnms.py
+    """
+    from tqdm import tqdm
+
+    array = []
+    for row in tqdm(efficient_iterrows(filename)):
+        item = {
+            "img_id": row[0],
+            "img_h": row[1],
+            "img_w": row[2], 
+            "objects_id": np_from_b64(row[3], dtype=np.int64),  # int64
+            "objects_conf": np_from_b64(row[4], dtype=np.float32),  # float32
+            "attrs_id": np_from_b64(row[5], dtype=np.int64),  # int64
+            "attrs_conf": np_from_b64(row[6], dtype=np.float32),  # float32
+            "num_boxes": row[7],
+            "boxes": np_from_b64(row[8], dtype=np.float32),  # float32
+            "features": np_from_b64(row[9], dtype=np.float32)  # float32
+        }
+        array.append(item)
+
+    return array

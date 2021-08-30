@@ -13,7 +13,7 @@ from augmentations.transforms import get_resize_augmentation, get_augmentation, 
 from pycocotools.coco import COCO
 from torch.utils.data import Dataset, DataLoader
 
-from .utils import create_masks, make_feature_batch
+from .utils import create_masks, make_feature_batch, decode_tsv
 from utils.utils import draw_image_caption
 
 class CocoDataset(Dataset):
@@ -23,14 +23,12 @@ class CocoDataset(Dataset):
     def __init__(self, 
             root_dir, ann_path, 
             tokenizer, image_size=[512,512], 
-            keep_ratio=False, patch_size=16, 
-            type='train', cache_dir=None):
+            keep_ratio=False,
+            type='train'):
 
-        self.cache_dir = cache_dir
         self.root_dir = root_dir
         self.ann_path = ann_path
         self.image_size = image_size
-        self.patch_size = patch_size
 
         self.tokenizer = tokenizer
         self.transforms = A.Compose([
@@ -40,9 +38,6 @@ class CocoDataset(Dataset):
 
         self.coco = COCO(ann_path)
         self.image_ids = self.coco.getImgIds()
-
-    def get_patch_dim(self):
-        return self.patch_size * self.patch_size * 3
 
     def __len__(self):
         return len(self.image_ids)
@@ -94,27 +89,14 @@ class CocoDataset(Dataset):
         for image_path in image_paths:
             image_names.append(os.path.basename(image_path))
 
-        if not self.cache_dir:
-            imgs = []
-            for image_path in image_paths:
-                image, ori_img = self.load_augment(image_path)
-                imgs.append(image)
-                ori_imgs.append(ori_img)
-            feats = torch.stack(imgs)
-            mask_shapes = int((self.image_size[0] / self.patch_size) **2)
-            image_masks = torch.ones((feats.shape[0], mask_shapes))
-        else:
-            npy_paths = [s[:-4] + '.npy' for s in image_names]
-            npy_paths = [os.path.join(self.cache_dir, s) for s in npy_paths]
-            feats = []
-            for npy_path in npy_paths:
-                feats.append(np.load(npy_path, allow_pickle=True)) # [64, 2048]
-            try:
-                feats = np.stack(feats)
-                feats = torch.from_numpy(feats)
-            except:
-                feats = make_feature_batch(feats, pad_token=0)
-            image_masks = torch.ones(feats.shape[:-1])
+        imgs = []
+        for image_path in image_paths:
+            image, ori_img = self.load_augment(image_path)
+            imgs.append(image)
+            ori_imgs.append(ori_img)
+        feats = torch.stack(imgs)
+        mask_shapes = int((self.image_size[0] / self.patch_size) **2)
+        image_masks = torch.ones((feats.shape[0], mask_shapes))
 
         texts = [s['text'] for s in batch]
         
@@ -226,5 +208,96 @@ class CocoDataset(Dataset):
 
     def __str__(self): 
         s1 = "Number of images: " + str(len(self.image_ids)) + '\n'
+        s2 = "Number of texts: " + str(len(self.coco.getAnnIds())) + '\n'
+        return s1 + s2
+
+
+class BottomUpDataset(Dataset):
+    def __init__(self, tsv_path, ann_path, tokenizer):
+        super().__init__()
+
+        self.use_attr = False
+        self.tokenizer = tokenizer
+        self.coco = COCO(ann_path)
+        self.fns = decode_tsv(tsv_path)
+
+    def __len__(self):
+        return len(self.fns)
+
+    def load_annotations(self, image_id, return_all=False):
+        # get ground truth annotations
+        annotations_ids = self.coco.getAnnIds(imgIds=image_id)
+
+        if not return_all:
+            if len(annotations_ids)>1:
+                ann_id = random.choice(annotations_ids)
+            anns = self.coco.loadAnns(ann_id)[0]['caption']
+        else:
+            anns = self.coco.loadAnns(annotations_ids)
+            anns = [i['caption'] for i in anns]
+        return anns
+
+    def __getitem__(self, index):
+        item = self.fns[index]
+        image_id = item['img_id']
+        obj_id = item["objects_id"] 
+        obj_conf = item["objects_conf"]
+
+        if self.use_attr:
+            attrs_id = item["attrs_id"] 
+            attrs_conf = item["attrs_conf"] 
+
+        boxes = item["boxes"] 
+        feats = torch.from_numpy(item["features"])
+
+        location_feats = np.concatenate([boxes, obj_id.reshape(-1,1)], axis=1)
+        location_feats = torch.from_numpy(location_feats)
+        text = self.load_annotations(index)
+
+        return {
+            'image_id': image_id,
+            'text': text,
+            "feats": feats,
+            "location_feats": location_feats,
+        }
+
+    def collate_fn(self, batch):
+        
+        image_ids = [s['image_id'] for s in batch]
+        feats = torch.stack([s['feats'] for s in batch])
+        loc_feats = torch.stack([s['location_feats'] for s in batch])
+        image_masks = torch.ones(feats.shape[:2])
+
+        texts = [s['text'] for s in batch]
+        
+        tokens = self.tokenizer(texts, truncation=True)
+        tokens = [np.array(i) for i in tokens['input_ids']]
+
+        texts_ = make_feature_batch(
+            tokens, pad_token=self.tokenizer.pad_token_id)
+        
+        texts_inp = texts_[:, :-1]
+        texts_res = texts_[:, 1:]
+
+        text_masks = create_masks(
+            texts_inp,
+            pad_token=self.tokenizer.pad_token_id, 
+            is_tgt_masking=True)
+        
+        texts_inp = texts_inp.squeeze(-1)
+
+        return {
+            'image_ids': image_ids,
+            'feats': feats,
+            'loc_feats': loc_feats,
+            'image_masks': image_masks.long(),
+            'tgt_texts_raw': texts,
+            'texts_inp': texts_inp.long(),
+            'texts_res': texts_res.long(),
+            'text_masks': text_masks.long(),
+        }
+
+    def __str__(self): 
+        s1 = "Number of images: " + str(len(self.fns)) + '\n'
         s2 = "Number of texts: " + str(len(self.coco.getAnnIds())) + '\n'
         return s1 + s2
