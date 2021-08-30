@@ -242,15 +242,16 @@ class BottomUpDataset(Dataset):
         image_id = item['img_id']
         obj_id = item["objects_id"] 
         obj_conf = item["objects_conf"]
+        num_boxes = item['num_boxes']
 
         if self.use_attr:
             attrs_id = item["attrs_id"] 
             attrs_conf = item["attrs_conf"] 
 
         boxes = item["boxes"] 
-        feats = torch.from_numpy(item["features"])
+        feats = torch.from_numpy(item["features"].reshape(num_boxes, -1))
 
-        location_feats = np.concatenate([boxes, obj_id.reshape(-1,1)], axis=1)
+        location_feats = np.concatenate([boxes.reshape(num_boxes, -1), obj_id.reshape(num_boxes, -1)], axis=1)
         location_feats = torch.from_numpy(location_feats)
         text = self.load_annotations(index)
 

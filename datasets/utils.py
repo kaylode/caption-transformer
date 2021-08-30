@@ -1,7 +1,10 @@
+import sys
 import csv
 import torch
 import base64
 import numpy as np
+
+csv.field_size_limit(sys.maxsize)
 
 def make_feature_batch(features,  pad_token=0):
     """
@@ -73,13 +76,13 @@ def decode_tsv(filename):
     for row in tqdm(efficient_iterrows(filename)):
         item = {
             "img_id": row[0],
-            "img_h": row[1],
-            "img_w": row[2], 
+            "img_h": int(row[1]),
+            "img_w": int(row[2]), 
             "objects_id": np_from_b64(row[3], dtype=np.int64),  # int64
             "objects_conf": np_from_b64(row[4], dtype=np.float32),  # float32
             "attrs_id": np_from_b64(row[5], dtype=np.int64),  # int64
             "attrs_conf": np_from_b64(row[6], dtype=np.float32),  # float32
-            "num_boxes": row[7],
+            "num_boxes": int(row[7]),
             "boxes": np_from_b64(row[8], dtype=np.float32),  # float32
             "features": np_from_b64(row[9], dtype=np.float32)  # float32
         }
