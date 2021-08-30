@@ -9,14 +9,14 @@ settings:
   
   model_name:  'catr' 
   language:    'bert-base-uncased'
-  image_size:   [384,384]
+  image_size:   [224,224]
   keep_ratio:   False
   patch_size:   16
 
   gpu_devices: '0'                     # supports multi-gpus
   num_epochs: 20
-  batch_size: 8
-  num_workers: 4
+  batch_size: 64
+  num_workers: 2
 
   # learning rate policy
   lr_policy:
