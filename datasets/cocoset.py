@@ -213,10 +213,11 @@ class CocoDataset(Dataset):
 
 
 class BottomUpDataset(Dataset):
-    def __init__(self, tsv_path, ann_path, tokenizer):
+    def __init__(self, root_dir, tsv_path, ann_path, tokenizer):
         super().__init__()
 
         self.use_attr = False
+        self.root_dir = root_dir
         self.tokenizer = tokenizer
         self.coco = COCO(ann_path)
         self.fns = decode_tsv(tsv_path)
