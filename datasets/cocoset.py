@@ -332,7 +332,7 @@ class NumpyFeatureDataset(Dataset):
     """
     Coco dataset
     """
-    def __init__(self, root_dir, ann_path, tokenizer, npy_dir,  type='train'):
+    def __init__(self, root_dir, ann_path, tokenizer, npy_dir):
 
         self.root_dir = root_dir
         self.ann_path = ann_path
@@ -351,8 +351,8 @@ class NumpyFeatureDataset(Dataset):
 
     def load_numpy(self, image_index):
         image_info = self.coco.loadImgs(self.image_ids[image_index])[0]
-        npy_path = os.path.join(self.root_dir, image_info['file_name'][:-4]+'.npz')
-        npy_loc_path = os.path.join(self.root_dir, image_info['file_name'][:-4]+'_loc.npz')
+        npy_path = os.path.join(self.npy_dir, image_info['file_name'][:-4]+'.npz')
+        npy_loc_path = os.path.join(self.npy_dir, image_info['file_name'][:-4]+'_loc.npz')
         return npy_path, npy_loc_path
 
     def load_annotations(self, image_index, return_all=False):
