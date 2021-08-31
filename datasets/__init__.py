@@ -1,1 +1,1 @@
-from .dataloader import EqualLengthTextLoader, RawTextLoader
+from .dataloader import EqualLengthTextLoader, RawTextLoader, BottomUpLoader

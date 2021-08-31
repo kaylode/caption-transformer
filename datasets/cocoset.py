@@ -229,8 +229,10 @@ class BottomUpDataset(Dataset):
         annotations_ids = self.coco.getAnnIds(imgIds=image_id)
 
         if not return_all:
-            if len(annotations_ids)>1:
+            if len(annotations_ids)>0:
                 ann_id = random.choice(annotations_ids)
+            else:
+                assert f"Image id: {image_id} is missing"
             anns = self.coco.loadAnns(ann_id)[0]['caption']
         else:
             anns = self.coco.loadAnns(annotations_ids)
@@ -253,7 +255,7 @@ class BottomUpDataset(Dataset):
 
         location_feats = np.concatenate([boxes.reshape(num_boxes, -1), obj_id.reshape(num_boxes, -1)], axis=1)
         location_feats = torch.from_numpy(location_feats)
-        text = self.load_annotations(index)
+        text = self.load_annotations(image_id)
 
         return {
             'image_id': image_id,
