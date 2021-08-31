@@ -141,6 +141,18 @@ def get_dataset_and_dataloader(config):
         patch_size=config.patch_size, type='val',
         image_size=config.image_size, keep_ratio=config.keep_ratio)
 
+    # trainloader = BottomUpLoader(
+    #     tsv_path=config.train_tsv,
+    #     batch_size=config.batch_size,
+    #     ann_path=config.train_anns,
+    #     tokenizer=AutoTokenizer.from_pretrained(config.language))
+
+    # valloader = BottomUpLoader(
+    #     tsv_path=config.val_tsv,
+    #     batch_size=32,
+    #     ann_path=config.val_anns,
+    #     tokenizer=AutoTokenizer.from_pretrained(config.language))
+
     return  trainloader.dataset, valloader.dataset, trainloader, valloader
 
 import torch
