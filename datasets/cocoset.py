@@ -218,6 +218,7 @@ class BottomUpDataset(Dataset):
 
         self.use_attr = False
         self.root_dir = root_dir
+        self.ann_path = ann_path
         self.tokenizer = tokenizer
         self.coco = COCO(ann_path)
         self.fns = decode_tsv(tsv_path)
@@ -257,7 +258,8 @@ class BottomUpDataset(Dataset):
             attrs_conf = item["attrs_conf"] 
 
         boxes = item["boxes"] 
-        feats = torch.from_numpy(item["features"].reshape(num_boxes, -1))
+        np_feats = item["features"].reshape(num_boxes, -1)
+        feats = torch.from_numpy(np_feats)
 
         location_feats = np.concatenate([boxes.reshape(num_boxes, -1), obj_id.reshape(num_boxes, -1)], axis=1)
         location_feats = torch.from_numpy(location_feats)
@@ -268,8 +270,8 @@ class BottomUpDataset(Dataset):
             'image_id': image_id,
             'image_path': image_path,
             'text': text,
-            "feats": feats,
-            "loc_feats": location_feats,
+            "feats": feats.float(),
+            "loc_feats": location_feats.float(),
         }
 
     def collate_fn(self, batch):

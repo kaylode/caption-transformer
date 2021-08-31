@@ -145,10 +145,10 @@ def get_dataset_and_dataloader(config):
         # root_dir=config.image_path,
     #     tsv_path=config.train_tsv,
     #     batch_size=config.batch_size,
-    #     ann_path=config.train_anns,
+    #     ann_path=config.train_anns, device=device,
     #     tokenizer=AutoTokenizer.from_pretrained(config.language))
 
-    # valloader = BottomUpLoader(
+    # valloader = RawBottomUpLoader(
         # root_dir=config.image_path,
     #     tsv_path=config.val_tsv,
     #     batch_size=32,
