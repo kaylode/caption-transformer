@@ -327,3 +327,121 @@ class BottomUpDataset(Dataset):
         s1 = "Number of images: " + str(len(self.fns)) + '\n'
         s2 = "Number of texts: " + str(len(self.coco.getAnnIds())) + '\n'
         return s1 + s2
+
+class NumpyFeatureDataset(Dataset):
+    """
+    Coco dataset
+    """
+    def __init__(self, root_dir, ann_path, tokenizer, npy_dir,  type='train'):
+
+        self.root_dir = root_dir
+        self.ann_path = ann_path
+        self.npy_dir = npy_dir
+        self.tokenizer = tokenizer
+        self.coco = COCO(ann_path)
+        self.image_ids = self.coco.getImgIds()
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def load_image(self, image_index):
+        image_info = self.coco.loadImgs(self.image_ids[image_index])[0]
+        image_path = os.path.join(self.root_dir, image_info['file_name'])
+        return image_path
+
+    def load_numpy(self, image_index):
+        image_info = self.coco.loadImgs(self.image_ids[image_index])[0]
+        npy_path = os.path.join(self.root_dir, image_info['file_name'][:-4]+'.npz')
+        npy_loc_path = os.path.join(self.root_dir, image_info['file_name'][:-4]+'_loc.npz')
+        return npy_path, npy_loc_path
+
+    def load_annotations(self, image_index, return_all=False):
+        # get ground truth annotations
+        annotations_ids = self.coco.getAnnIds(imgIds=self.image_ids[image_index])
+
+        if not return_all:
+            if len(annotations_ids)>1:
+                ann_id = random.choice(annotations_ids)
+            anns = self.coco.loadAnns(ann_id)[0]['caption']
+        else:
+            anns = self.coco.loadAnns(annotations_ids)
+            anns = [i['caption'] for i in anns]
+        return anns
+
+    def __getitem__(self, index):
+        image_id = self.image_ids[index]
+        image_path = self.load_image(index)
+        npy_path, npy_loc_path = self.load_numpy(index)
+        text = self.load_annotations(index)
+
+        return {
+            'image_id': image_id,
+            'npy_path': npy_path,
+            "npy_loc_path": npy_loc_path,
+            'image_path': image_path,
+            'text': text,
+        }
+
+    def collate_fn(self, batch):
+        
+        image_paths = [s['image_path'] for s in batch]
+        npy_paths = [s['npy_path'] for s in batch]
+        npy_loc_paths = [s['npy_loc_path'] for s in batch]
+        image_ids = [s['image_id'] for s in batch]
+        
+        image_names = []
+        ori_imgs = []
+        for image_path in image_paths:
+            image_names.append(os.path.basename(image_path))
+
+        for image_path in image_paths:
+            ori_img = cv2.imread(image_path)
+            ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+            ori_imgs.append(ori_img)
+        
+        npy_feats = []
+        npy_loc_feats = []
+        for npy_path, npy_loc_path in zip(npy_paths, npy_loc_paths):
+            npy_feat = np.load(npy_path)
+            npy_loc_feat = np.load(npy_loc_path)
+            npy_feats.append(npy_feat)
+            npy_loc_feats.append(npy_loc_feat)
+
+        npy_feats = np.stack(npy_feats, axis=0)
+        npy_loc_feats = np.stack(npy_loc_feats, axis=0)
+
+        feats = torch.from_numpy(npy_feats)
+        loc_feats = torch.from_numpy(npy_loc_feats)
+
+        image_masks = torch.ones(feats.shape[:2])
+
+        texts = [s['text'] for s in batch]
+        
+        tokens = self.tokenizer(texts, truncation=True)
+        tokens = [np.array(i) for i in tokens['input_ids']]
+
+        texts_ = make_feature_batch(
+            tokens, pad_token=self.tokenizer.pad_token_id)
+        
+        texts_inp = texts_[:, :-1]
+        texts_res = texts_[:, 1:]
+
+        text_masks = create_masks(
+            texts_inp,
+            pad_token=self.tokenizer.pad_token_id, 
+            is_tgt_masking=True)
+        
+        texts_inp = texts_inp.squeeze(-1)
+
+        return {
+            'image_ids': image_ids,
+            'image_names': image_names,
+            'ori_imgs': ori_imgs,
+            'feats': feats,
+            'loc_feats': loc_feats,
+            'image_masks': image_masks.long(),
+            'tgt_texts_raw': texts,
+            'texts_inp': texts_inp.long(),
+            'texts_res': texts_res.long(),
+            'text_masks': text_masks.long(),
+        }

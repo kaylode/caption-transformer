@@ -1,1 +1,1 @@
-from .dataloader import EqualLengthTextLoader, RawTextLoader, BottomUpLoader, RawBottomUpLoader
+from .dataloader import EqualLengthTextLoader, RawTextLoader, BottomUpLoader, RawBottomUpLoader, NumpyFeatureLoader, RawNumpyFeatureLoader
