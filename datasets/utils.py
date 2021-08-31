@@ -75,7 +75,7 @@ def decode_tsv(filename):
     array = []
     for row in tqdm(efficient_iterrows(filename)):
         item = {
-            "img_id": row[0],
+            "img_id": int(row[0]),
             "img_h": int(row[1]),
             "img_w": int(row[2]), 
             "objects_id": np_from_b64(row[3], dtype=np.int64),  # int64

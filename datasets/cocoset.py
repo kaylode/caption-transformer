@@ -224,6 +224,11 @@ class BottomUpDataset(Dataset):
     def __len__(self):
         return len(self.fns)
 
+    def load_image(self, image_id):
+        image_info = self.coco.loadImgs(image_id)[0]
+        image_path = os.path.join(self.root_dir, image_info['file_name'])
+        return image_path
+
     def load_annotations(self, image_id, return_all=False):
         # get ground truth annotations
         annotations_ids = self.coco.getAnnIds(imgIds=image_id)
@@ -255,10 +260,12 @@ class BottomUpDataset(Dataset):
 
         location_feats = np.concatenate([boxes.reshape(num_boxes, -1), obj_id.reshape(num_boxes, -1)], axis=1)
         location_feats = torch.from_numpy(location_feats)
+        image_path = self.load_image(image_id)
         text = self.load_annotations(image_id)
-
+        
         return {
             'image_id': image_id,
+            'image_path': image_path,
             'text': text,
             "feats": feats,
             "loc_feats": location_feats,
@@ -267,9 +274,20 @@ class BottomUpDataset(Dataset):
     def collate_fn(self, batch):
         
         image_ids = [s['image_id'] for s in batch]
+        image_paths = [s['image_path'] for s in batch]
         feats = torch.stack([s['feats'] for s in batch])
         loc_feats = torch.stack([s['loc_feats'] for s in batch])
         image_masks = torch.ones(feats.shape[:2])
+
+        image_names = []
+        ori_imgs = []
+        for image_path in image_paths:
+            image_names.append(os.path.basename(image_path))
+
+        for image_path in image_paths:
+            ori_img = cv2.imread(image_path)
+            ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+            ori_imgs.append(ori_img)
 
         texts = [s['text'] for s in batch]
         
@@ -288,9 +306,11 @@ class BottomUpDataset(Dataset):
             is_tgt_masking=True)
         
         texts_inp = texts_inp.squeeze(-1)
-
+        
         return {
             'image_ids': image_ids,
+            'image_names': image_names,
+            'ori_imgs': ori_imgs,
             'feats': feats,
             'loc_feats': loc_feats,
             'image_masks': image_masks.long(),
