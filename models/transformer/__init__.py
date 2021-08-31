@@ -146,7 +146,7 @@ class Transformer(nn.Module):
     :output:
         next words probability shape [batch * input length * vocab_dim]
     """
-    def __init__(self, trg_vocab, patch_size=16, d_model=768, d_ff=3072, N_enc=12, N_dec=4, heads=12, dropout=0.2, num_channels=3, pretrained_encoder=True, bottom_up=False):
+    def __init__(self, trg_vocab, patch_size=16, d_model=768, d_ff=3072, N_enc=12, N_dec=4, heads=12, dropout=0.2, num_channels=3, pretrained_encoder=True):
         super().__init__()
         self.name = "Transformer"
 
@@ -194,6 +194,57 @@ class Transformer(nn.Module):
         #     top_k = top_k, top_p=top_p, 
         #     temperature = temperature,
         #     tokenizer=tokenizer)
+
+        outputs = beam_search(
+            self, 
+            src=src_inputs, 
+            src_mask=src_masks,
+            tokenizer=tokenizer, 
+            max_len=max_len, k=3, alpha=0.7)
+
+        return outputs
+
+class TransformerBottomUp(nn.Module):
+    """
+    Transformer model
+    :input:
+        patch_size:    size of patch
+        trg_vocab:     size of target vocab
+        d_model:       embeddings dim
+        d_ff:          feed-forward dim
+        N:             number of layers
+        heads:         number of attetion heads
+        dropout:       dropout rate
+    :output:
+        next words probability shape [batch * input length * vocab_dim]
+    """
+    def __init__(self, trg_vocab, feat_dim, d_model=768, d_ff=3072, N_enc=12, N_dec=4, heads=12, dropout=0.2):
+        super().__init__()
+        self.name = "TransformerBottomUp"
+
+        self.encoder = EncoderBottomUp(feat_dim, d_model, d_ff, N_enc, heads, dropout)
+        self.decoder = Decoder(trg_vocab, d_model, d_ff, N_dec, heads, dropout)
+        self.out = nn.Linear(d_model, trg_vocab)
+        init_xavier(self)
+
+    def forward(self, src, loc_src, trg, src_mask, trg_mask, *args, **kwargs):
+        e_outputs = self.encoder(src, loc_src)
+        d_output = self.decoder(trg, e_outputs, src_mask, trg_mask)
+        output = self.out(d_output)
+        return output
+        
+    def predict(
+        self, src_inputs, src_masks, 
+        tokenizer, max_len=None, 
+        top_k = 5, top_p=0.9, temperature = 0.9,
+        *args, **kwargs):
+
+        """
+        Inference step
+        """
+
+        if max_len is None:
+            max_len = src_inputs.shape[-1]
 
         outputs = beam_search(
             self, 
