@@ -258,7 +258,7 @@ class BottomUpDataset(Dataset):
             attrs_conf = item["attrs_conf"] 
 
         boxes = item["boxes"] 
-        np_feats = item["features"].reshape(num_boxes, -1)
+        np_feats = item["features"].reshape(num_boxes, -1).setflags(write=1)
         feats = torch.from_numpy(np_feats)
 
         location_feats = np.concatenate([boxes.reshape(num_boxes, -1), obj_id.reshape(num_boxes, -1)], axis=1)

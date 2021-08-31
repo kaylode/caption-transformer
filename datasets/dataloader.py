@@ -113,7 +113,7 @@ class RawBottomUpLoader(DataLoader):
         self.tokenizer = self.dataset.tokenizer
         self.collate_fn = self.dataset.collate_fn
         
-        super(RawTextLoader, self).__init__(
+        super(RawBottomUpLoader, self).__init__(
             self.dataset,
             batch_size=batch_size,
             num_workers=2,
