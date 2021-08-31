@@ -1,4 +1,4 @@
-from .cocoset import CocoDataset
+from .cocoset import CocoDataset, BottomUpDataset
 from torch.utils.data import DataLoader
 from torchtext.legacy.data import BucketIterator
 
@@ -69,5 +69,30 @@ class RawTextLoader(DataLoader):
             self.dataset,
             batch_size=batch_size,
             num_workers=2,
+            pin_memory=True,
+            collate_fn=self.collate_fn)
+
+class BottomUpLoader(DataLoader):
+    """
+    Use DataLoader to make texts into batch
+    """
+    def __init__(self, 
+                batch_size,
+                tsv_path, 
+                ann_path, 
+                tokenizer,
+                **kwargs):
+       
+        self.dataset = BottomUpDataset(
+                tsv_path, ann_path, tokenizer)
+
+        self.tokenizer = self.dataset.tokenizer
+        self.collate_fn = self.dataset.collate_fn
+        
+        super(BottomUpLoader, self).__init__(
+            self.dataset,
+            batch_size=batch_size,
+            num_workers=2,
+            shuffle=True,
             pin_memory=True,
             collate_fn=self.collate_fn)

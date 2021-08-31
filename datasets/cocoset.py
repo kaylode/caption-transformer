@@ -259,14 +259,14 @@ class BottomUpDataset(Dataset):
             'image_id': image_id,
             'text': text,
             "feats": feats,
-            "location_feats": location_feats,
+            "loc_feats": location_feats,
         }
 
     def collate_fn(self, batch):
         
         image_ids = [s['image_id'] for s in batch]
         feats = torch.stack([s['feats'] for s in batch])
-        loc_feats = torch.stack([s['location_feats'] for s in batch])
+        loc_feats = torch.stack([s['loc_feats'] for s in batch])
         image_masks = torch.ones(feats.shape[:2])
 
         texts = [s['text'] for s in batch]
