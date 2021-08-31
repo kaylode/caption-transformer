@@ -68,12 +68,29 @@ class PositionalEncoding(nn.Module):
                          requires_grad=False)
         return self.dropout(x)
 
-if __name__ == '__main__':
-    import numpy as np
-    import matplotlib.pyplot as plt
+class FeatureEmbedding(nn.Module):
+    """
+    Projects image features into a space of
+    dimensionality `embed_dim`.
+    """
 
-    plt.figure(figsize=(15, 5))
-    pe = PositionalEncoding(20, 0)
-    y = pe.forward(Variable(torch.zeros(1, 100, 20)))
-    plt.plot(np.arange(100), y[0, :, 4:8].data.numpy())
-    plt.legend(["dim %d"%p for p in [4,5,6,7]])
+    def __init__(self, features_dim, embed_dim):
+        super().__init__()
+        self.linear = nn.Linear(features_dim, embed_dim)
+
+    def forward(self, x):
+        return self.linear(x)
+
+
+class SpatialEncoding(nn.Module):
+    """
+    Encodes bounding box coordinates and relative sizes
+    as vector of dimensionality `embed_dim`.
+    """
+
+    def __init__(self, embed_dim):
+        super().__init__()
+        self.linear = nn.Linear(5, embed_dim)
+
+    def forward(self, x):
+        return self.linear(x)
