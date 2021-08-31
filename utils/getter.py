@@ -125,35 +125,35 @@ def get_dataset_and_dataloader(config):
 
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
-    trainloader = EqualLengthTextLoader(
-        ann_path=config.train_anns,
-        root_dir=config.image_path,
-        tokenizer=AutoTokenizer.from_pretrained(config.language),
-        image_size=config.image_size, keep_ratio=config.keep_ratio,
-        patch_size=config.patch_size, type='train',
-        batch_size=config.batch_size, device=device)
+    # trainloader = EqualLengthTextLoader(
+    #     ann_path=config.train_anns,
+    #     root_dir=config.image_path,
+    #     tokenizer=AutoTokenizer.from_pretrained(config.language),
+    #     image_size=config.image_size, keep_ratio=config.keep_ratio,
+    #     patch_size=config.patch_size, type='train',
+    #     batch_size=config.batch_size, device=device)
 
-    valloader = RawTextLoader(
-        batch_size=config.batch_size,
-        ann_path=config.val_anns,
-        root_dir=config.image_path,
-        tokenizer=AutoTokenizer.from_pretrained(config.language),
-        patch_size=config.patch_size, type='val',
-        image_size=config.image_size, keep_ratio=config.keep_ratio)
-
-    # trainloader = BottomUpLoader(
-        # root_dir=config.image_path,
-    #     tsv_path=config.train_tsv,
+    # valloader = RawTextLoader(
     #     batch_size=config.batch_size,
-    #     ann_path=config.train_anns, device=device,
-    #     tokenizer=AutoTokenizer.from_pretrained(config.language))
-
-    # valloader = RawBottomUpLoader(
-        # root_dir=config.image_path,
-    #     tsv_path=config.val_tsv,
-    #     batch_size=32,
     #     ann_path=config.val_anns,
-    #     tokenizer=AutoTokenizer.from_pretrained(config.language))
+    #     root_dir=config.image_path,
+    #     tokenizer=AutoTokenizer.from_pretrained(config.language),
+    #     patch_size=config.patch_size, type='val',
+    #     image_size=config.image_size, keep_ratio=config.keep_ratio)
+
+    trainloader = BottomUpLoader(
+        root_dir=config.image_path,
+        tsv_path=config.train_tsv,
+        batch_size=config.batch_size,
+        ann_path=config.train_anns, device=device,
+        tokenizer=AutoTokenizer.from_pretrained(config.language))
+
+    valloader = RawBottomUpLoader(
+        root_dir=config.image_path,
+        tsv_path=config.val_tsv,
+        batch_size=32,
+        ann_path=config.val_anns,
+        tokenizer=AutoTokenizer.from_pretrained(config.language))
 
     return  trainloader.dataset, valloader.dataset, trainloader, valloader
 
