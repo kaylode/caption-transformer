@@ -1,5 +1,4 @@
 from .base_model import BaseModel
-from models.transformer.search import sampling_search
 
 import sys
 sys.path.append('..')
@@ -56,6 +55,7 @@ class Captioning(BaseModel):
 
         outputs = self.model.predict(
             src_inputs = src_inputs,
+            src_loc = loc_src_inputs,
             src_masks = src_masks, 
             tokenizer = tgt_tokenizer,
             max_len=64)

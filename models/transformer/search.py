@@ -128,7 +128,7 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
     return results
 
 
-def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
+def beam_search(model, src, src_loc, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
     """
     Beam search for generation. Apply for batch
     :input:
@@ -141,7 +141,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         alpha:          length penalty parameter
     """
 
-    def init_vars(model, src_text, src_mask, tgt_tokenizer, max_len=64, k=5, device = None):
+    def init_vars(model, src_text, src_loc, src_mask, tgt_tokenizer, max_len=64, k=5, device = None):
         """
         Encode texts and initialize beam
         """
@@ -149,7 +149,10 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         start_symbol = tgt_tokenizer.cls_token_id #tgt_tokenizer.bos_token_id
         
         # Encoded inputs
-        memory = model.encoder(src_text)
+        if src_loc is not None:
+            memory = model.encoder(src_text, src_loc)
+        else:
+            memory = model.encoder(src_text)
 
         # Result tokens
         ys = torch.ones(batch_size, 1).fill_(start_symbol).long()
@@ -212,7 +215,7 @@ def beam_search(model, src, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
         max_len = src.shape[-1]
 
     ys, memorys, log_scores = init_vars(
-        model, src, src_mask, tokenizer, 
+        model, src, src_loc, src_mask, tokenizer, 
         max_len=max_len, k=k, device=device)
 
     results = []

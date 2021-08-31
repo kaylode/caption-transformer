@@ -234,7 +234,7 @@ class TransformerBottomUp(nn.Module):
         return output
         
     def predict(
-        self, src_inputs, src_masks, 
+        self, src_inputs, src_loc, src_masks, 
         tokenizer, max_len=None, 
         top_k = 5, top_p=0.9, temperature = 0.9,
         *args, **kwargs):
@@ -249,6 +249,7 @@ class TransformerBottomUp(nn.Module):
         outputs = beam_search(
             self, 
             src=src_inputs, 
+            src_loc=src_loc,
             src_mask=src_masks,
             tokenizer=tokenizer, 
             max_len=max_len, k=3, alpha=0.7)

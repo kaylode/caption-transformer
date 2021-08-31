@@ -18,10 +18,10 @@ def get_transformer_model(patch_size, trg_vocab):
 
     return Transformer(**transformer_config)
 
-def get_transformer_model(bottom_up_dim, trg_vocab):
+def get_transformer_bottomup_model(bottom_up_dim, trg_vocab):
 
     transformer_config = {
-        'feat_dime':       bottom_up_dim,
+        'feat_dim':       bottom_up_dim,
         'trg_vocab':        trg_vocab, 
         "d_model":          768, 
         "d_ff":             3072,
