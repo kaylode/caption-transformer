@@ -29,8 +29,8 @@ def train(args, config):
         trainset.cache_dir = args.cache_dir
         valset.cache_dir = args.cache_dir
 
-    net = get_transformer_model(
-        patch_size=config.patch_size,
+    net = get_transformer_bottomup_model(
+        bottom_up_dim=2048,
         trg_vocab=trainset.tokenizer.vocab_size)
 
     optimizer, optimizer_params = get_lr_policy(config.lr_policy)

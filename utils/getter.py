@@ -141,16 +141,16 @@ def get_dataset_and_dataloader(config):
     #     patch_size=config.patch_size, type='val',
     #     image_size=config.image_size, keep_ratio=config.keep_ratio)
 
-    trainloader = BottomUpLoader(
+    trainloader = NumpyFeatureLoader(
         root_dir=config.image_path,
-        tsv_path=config.train_tsv,
+        npy_dir=config.npy_dir,
         batch_size=config.batch_size,
         ann_path=config.train_anns, device=device,
         tokenizer=AutoTokenizer.from_pretrained(config.language))
 
-    valloader = RawBottomUpLoader(
+    valloader = RawNumpyFeatureLoader(
         root_dir=config.image_path,
-        tsv_path=config.val_tsv,
+        npy_dir=config.npy_dir,
         batch_size=32,
         ann_path=config.val_anns,
         tokenizer=AutoTokenizer.from_pretrained(config.language))

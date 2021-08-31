@@ -5,8 +5,9 @@ settings:
   image_path: 
   train_anns:
   val_anns:
-  train_tsv:
-  val_tsv:
+  npy_dir:
+  # train_tsv:
+  # val_tsv:
   #################   TRAINING CONFIG   ###################
   
   model_name:  'catr' 

@@ -402,16 +402,16 @@ class NumpyFeatureDataset(Dataset):
         npy_feats = []
         npy_loc_feats = []
         for npy_path, npy_loc_path in zip(npy_paths, npy_loc_paths):
-            npy_feat = np.load(npy_path)
-            npy_loc_feat = np.load(npy_loc_path)
+            npy_feat = np.load(npy_path, mmap_mode='r')['arr_0']
+            npy_loc_feat = np.load(npy_loc_path, mmap_mode='r')['arr_0']
             npy_feats.append(npy_feat)
             npy_loc_feats.append(npy_loc_feat)
 
         npy_feats = np.stack(npy_feats, axis=0)
         npy_loc_feats = np.stack(npy_loc_feats, axis=0)
 
-        feats = torch.from_numpy(npy_feats)
-        loc_feats = torch.from_numpy(npy_loc_feats)
+        feats = torch.from_numpy(npy_feats).float()
+        loc_feats = torch.from_numpy(npy_loc_feats).float()
 
         image_masks = torch.ones(feats.shape[:2])
 
