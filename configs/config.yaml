@@ -6,18 +6,16 @@ settings:
   train_anns:
   val_anns:
   npy_dir:
-  # train_tsv:
-  # val_tsv:
+
   #################   TRAINING CONFIG   ###################
   
   model_name:  'catr' 
   language:    'bert-base-uncased'
-  image_size:   [224,224]
+  image_size:   [224,224]               # 224 or 384 (pretrained vit support these only)
   keep_ratio:   False
-  patch_size:   16
 
   gpu_devices: '0'                     # supports multi-gpus
-  num_epochs: 20
+  num_epochs: 100
   batch_size: 64
   num_workers: 2
 
