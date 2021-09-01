@@ -2,7 +2,7 @@
 Image captioning using Transformer
 
 ## Methods
-- This repo provides two ways of applying Transformer in Image Captioning with pretrained VIT Encoder or Bottom-Up Attention Encoder
+- This repo provides two ways of applying Transformer in Image Captioning with [pretrained VIT](https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py) Encoder or Bottom-Up Attention Encoder
 - To extract bottom-up features, we provide [Colab Notebook](https://colab.research.google.com/drive/1xC4mVc_bp0t4-7T4xVum3AECFCalsgsv?usp=sharing) which adapts [Detectron model](https://github.com/airsplay/py-bottom-up-attention)
 
 ## Paper References
@@ -12,6 +12,7 @@ Image captioning using Transformer
   - Transformer Bottom-Up Attention: https://github.com/krasserm/fairseq-image-captioning
 
 ## Code References
+- https://github.com/rwightman/pytorch-image-models
 - https://github.com/SamLynnEvans/Transformer
 - https://nlp.seas.harvard.edu/2018/04/03/attention.html
 - https://github.com/salaniz/pycocoevalcap
