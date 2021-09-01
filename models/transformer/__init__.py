@@ -18,7 +18,7 @@ def get_clones(module, N):
     """
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
-def get_pretrained_encoder(model_name='deit_tiny_distilled_patch16_224'):
+def get_pretrained_encoder(model_name):
     import timm
     assert model_name in TIMM_MODELS, "Timm Model not found"
     model = timm.create_model(model_name, pretrained=True)
@@ -58,10 +58,10 @@ class EncoderVIT(nn.Module):
     :output:
         encoded embeddings shape [batch * (image_size/patch_size)**2 * model_dim]
     """
-    def __init__(self):
+    def __init__(self, model_name='deit_base_distilled_patch16_224'):
         super().__init__()
         
-        vit = get_pretrained_encoder()
+        vit = get_pretrained_encoder(model_name)
         self.embed_dim = vit.embed_dim 
         self.patch_embed = vit.patch_embed
         self.pos_embed = vit.pos_embed

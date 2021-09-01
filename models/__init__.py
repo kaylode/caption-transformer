@@ -1,10 +1,9 @@
 from .transformer import Transformer, TransformerBottomUp
 from .captioning import Captioning
 
-def get_transformer_model(patch_size, trg_vocab):
+def get_transformer_model(trg_vocab):
 
     transformer_config = {
-        'patch_size':       patch_size,
         'trg_vocab':        trg_vocab, 
         "d_model":          512, 
         "d_ff":             3072,

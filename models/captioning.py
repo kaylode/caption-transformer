@@ -1,4 +1,6 @@
+from numpy.lib.arraysetops import isin
 from .base_model import BaseModel
+from .transformer import Transformer, TransformerBottomUp
 
 import sys
 sys.path.append('..')
@@ -18,15 +20,23 @@ class Captioning(BaseModel):
 
         if self.device:
             self.model.to(self.device)
+
+        if isinstance(self.model, Transformer):
+            self.bottom_up = False
+        elif isinstance(self.model, TransformerBottomUp):
+            self.bottom_up = True
         
     def forward(self, x):
         return self.model(x)
 
     def training_step(self, batch):
         
-        src_inputs = batch['feats'].to(self.device)
-        loc_src_inputs = batch['loc_feats'].to(self.device)
-        # src_inputs = batch['image_patches'].to(self.device)
+        if self.bottom_up:
+            src_inputs = batch['feats'].to(self.device)
+            loc_src_inputs = batch['loc_feats'].to(self.device)
+        else:
+            src_inputs = batch['image_patches'].to(self.device)
+            loc_src_inputs = None
         src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
         tgt_inputs = batch['texts_inp'].to(self.device)
         tgt_targets = batch['texts_res'].to(self.device)
@@ -48,9 +58,13 @@ class Captioning(BaseModel):
 
     def inference_step(self, batch, tgt_tokenizer):
         
-        src_inputs = batch['feats'].to(self.device)
-        loc_src_inputs = batch['loc_feats'].to(self.device)
-        # src_inputs = batch['image_patches'].to(self.device)
+        if self.bottom_up:
+            src_inputs = batch['feats'].to(self.device)
+            loc_src_inputs = batch['loc_feats'].to(self.device)
+        else:
+            src_inputs = batch['image_patches'].to(self.device)
+            loc_src_inputs = None
+            
         src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
 
         outputs = self.model.predict(
@@ -64,9 +78,13 @@ class Captioning(BaseModel):
 
     def evaluate_step(self, batch):
 
-        src_inputs = batch['feats'].to(self.device)
-        loc_src_inputs = batch['loc_feats'].to(self.device)
-        # src_inputs = batch['image_patches'].to(self.device)
+        if self.bottom_up:
+            src_inputs = batch['feats'].to(self.device)
+            loc_src_inputs = batch['loc_feats'].to(self.device)
+        else:
+            src_inputs = batch['image_patches'].to(self.device)
+            loc_src_inputs = None
+
         src_masks = batch['image_masks'].unsqueeze(-2).to(self.device)
         tgt_inputs = batch['texts_inp'].to(self.device)
         tgt_targets = batch['texts_res'].to(self.device)

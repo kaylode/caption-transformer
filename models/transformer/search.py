@@ -66,7 +66,7 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')
     return logits
 
 
-def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, top_p=0.92, temperature = 1.0):
+def sampling_search(model, src, src_mask, tokenizer, src_loc=None, max_len=None, top_k = 100, top_p=0.92, temperature = 1.0):
     """
     Sampling search for generation. Apply for batch
     :input:
@@ -92,7 +92,10 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
 
     with torch.no_grad():
         # Encoder output
-        memory = model.encoder(src)
+        if src_loc:
+            memory = model.encoder(src, src_loc)
+        else:
+            memory = model.encoder(src)
     
         for i in range(max_len-1):
 
@@ -128,7 +131,7 @@ def sampling_search(model, src, src_mask, tokenizer, max_len=None, top_k = 100, 
     return results
 
 
-def beam_search(model, src, src_loc, src_mask, tokenizer, max_len=None, k=5, alpha=0.6):
+def beam_search(model, src, src_mask, tokenizer, src_loc=None, max_len=None, k=5, alpha=0.6):
     """
     Beam search for generation. Apply for batch
     :input:
