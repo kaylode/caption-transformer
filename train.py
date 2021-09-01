@@ -8,8 +8,8 @@ parser.add_argument('--save_interval', type=int, default=1000, help='Number of s
 parser.add_argument('--resume', type=str, default=None,
                     help='whether to load weights from a checkpoint, set None to initialize')
 parser.add_argument('--saved_path', type=str, default='./weights')
-parser.add_argument('--cache_dir', type=str, default=None, help='Cache directory for pre-computed input features')
 parser.add_argument('--no_visualization', action='store_false', help='whether to visualize box to ./sample when validating (for debug), default=on')
+parser.add_argument('--bottom-up', action='store_true', help='use bottom-up attention, must provided npy_path in config')
 
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.fastest = True
@@ -22,16 +22,15 @@ def train(args, config):
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
     devices_info = get_devices_info(config.gpu_devices)
     
-    trainset, valset, trainloader, valloader = get_dataset_and_dataloader(config)
-    
-    if args.cache_dir:
-        print("Using cache features")
-        trainset.cache_dir = args.cache_dir
-        valset.cache_dir = args.cache_dir
+    trainset, valset, trainloader, valloader = get_dataset_and_dataloader(config, args.bottom_up)
 
-    net = get_transformer_bottomup_model(
-        bottom_up_dim=2048,
-        trg_vocab=trainset.tokenizer.vocab_size)
+    if args.bottom_up:
+        net = get_transformer_bottomup_model(
+            bottom_up_dim=trainset.get_feature_dim(),
+            trg_vocab=trainset.tokenizer.vocab_size)
+    else:
+        net = get_transformer_model(
+            trg_vocab=trainset.tokenizer.vocab_size)
 
     optimizer, optimizer_params = get_lr_policy(config.lr_policy)
 

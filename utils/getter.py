@@ -121,39 +121,34 @@ def get_lr_scheduler(optimizer, lr_config, **kwargs):
     return scheduler, step_per_epoch
 
 
-def get_dataset_and_dataloader(config):
+def get_dataset_and_dataloader(config, bottom_up):
 
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+    
+    if not bottom_up:
+        trainloader = EqualLengthTextLoader(
+            ann_path=config.train_anns, root_dir=config.image_path,
+            image_size=config.image_size, keep_ratio=config.keep_ratio,
+            tokenizer=AutoTokenizer.from_pretrained(config.language),
+            type='train', batch_size=config.batch_size, device=device)
 
-    # trainloader = EqualLengthTextLoader(
-    #     ann_path=config.train_anns,
-    #     root_dir=config.image_path,
-    #     tokenizer=AutoTokenizer.from_pretrained(config.language),
-    #     image_size=config.image_size, keep_ratio=config.keep_ratio,
-    #     patch_size=config.patch_size, type='train',
-    #     batch_size=config.batch_size, device=device)
+        valloader = RawTextLoader(
+            ann_path=config.val_anns, root_dir=config.image_path,
+            image_size=config.image_size, keep_ratio=config.keep_ratio,
+            tokenizer=AutoTokenizer.from_pretrained(config.language),
+            type='val', batch_size=config.batch_size)
+    else:
+        trainloader = NumpyFeatureLoader(
+            root_dir=config.image_path, npy_dir=config.npy_dir,
+            batch_size=config.batch_size,
+            ann_path=config.train_anns, device=device,
+            tokenizer=AutoTokenizer.from_pretrained(config.language))
 
-    # valloader = RawTextLoader(
-    #     batch_size=config.batch_size,
-    #     ann_path=config.val_anns,
-    #     root_dir=config.image_path,
-    #     tokenizer=AutoTokenizer.from_pretrained(config.language),
-    #     patch_size=config.patch_size, type='val',
-    #     image_size=config.image_size, keep_ratio=config.keep_ratio)
-
-    trainloader = NumpyFeatureLoader(
-        root_dir=config.image_path,
-        npy_dir=config.npy_dir,
-        batch_size=config.batch_size,
-        ann_path=config.train_anns, device=device,
-        tokenizer=AutoTokenizer.from_pretrained(config.language))
-
-    valloader = RawNumpyFeatureLoader(
-        root_dir=config.image_path,
-        npy_dir=config.npy_dir,
-        batch_size=32,
-        ann_path=config.val_anns,
-        tokenizer=AutoTokenizer.from_pretrained(config.language))
+        valloader = RawNumpyFeatureLoader(
+            root_dir=config.image_path, npy_dir=config.npy_dir,
+            batch_size=32,
+            ann_path=config.val_anns,
+            tokenizer=AutoTokenizer.from_pretrained(config.language))
 
     return  trainloader.dataset, valloader.dataset, trainloader, valloader
 

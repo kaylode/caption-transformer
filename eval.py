@@ -3,7 +3,7 @@ import argparse
 
 parser = argparse.ArgumentParser('Evaluate model on COCO Format')
 parser.add_argument('--weight' , type=str, help='checkpoint')
-parser.add_argument('--cache_dir', type=str, default=None, help='Cache directory for pre-computed input features')
+parser.add_argument('--bottom-up', action='store_true', help='use bottom-up attention, must provided npy_path in config')
 
 seed_everything()
 
@@ -15,16 +15,15 @@ def main(args, config):
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
     trainset, valset, _, valloader = get_dataset_and_dataloader(config)
 
-    if args.cache_dir:
-        print("Using cache features")
-        trainset.cache_dir = args.cache_dir
-        valset.cache_dir = args.cache_dir
-
     metric = NLPMetrics(valloader, metrics_list=['bleu', "meteor", 'rouge', 'cider', 'spice'])
 
-    net = get_transformer_model(
-        patch_size=config.patch_size,
-        trg_vocab=trainset.tokenizer.vocab_size)
+    if args.bottom_up:
+        net = get_transformer_bottomup_model(
+            bottom_up_dim=trainset.get_feature_dim(),
+            trg_vocab=trainset.tokenizer.vocab_size)
+    else:
+        net = get_transformer_model(
+            trg_vocab=trainset.tokenizer.vocab_size)
 
     net.eval()
     model = Captioning(model = net, device = device)
