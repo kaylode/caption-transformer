@@ -92,7 +92,7 @@ def sampling_search(model, src, src_mask, tokenizer, src_loc=None, max_len=None,
 
     with torch.no_grad():
         # Encoder output
-        if src_loc:
+        if src_loc is not None:
             memory = model.encoder(src, src_loc)
         else:
             memory = model.encoder(src)
