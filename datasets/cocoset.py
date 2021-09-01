@@ -341,6 +341,9 @@ class NumpyFeatureDataset(Dataset):
         self.coco = COCO(ann_path)
         self.image_ids = self.coco.getImgIds()
 
+    def get_feature_dim(self):
+        return 2048 # bottom up attention features
+
     def __len__(self):
         return len(self.image_ids)
 
@@ -445,3 +448,8 @@ class NumpyFeatureDataset(Dataset):
             'texts_res': texts_res.long(),
             'text_masks': text_masks.long(),
         }
+
+    def __str__(self): 
+        s1 = "Number of images: " + str(len(self.image_ids)) + '\n'
+        s2 = "Number of texts: " + str(len(self.coco.getAnnIds())) + '\n'
+        return s1 + s2
