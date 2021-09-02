@@ -19,6 +19,14 @@ Model | Bleu_1 | Bleu_2 | Bleu_3 | Bleu_4 | METEOR | ROUGE_L | CIDEr | SPICE
 [Transformer (deit_tiny_distilled_patch16_224)](https://drive.google.com/file/d/1-VYNfi6BPz823rzjs0LEoqXEgDiWnDon/view?usp=sharing) | 0.61111 | 0.432 | 0.30164 | 0.21026 | 0.18603 | 0.44001 | 0.39589 | 0.1213
 [Transformer (frcnn_bottomup_attention)](https://drive.google.com/file/d/1-h4rODxBeVpwlNL1dZQmV_PZH0R-0SW9/view?usp=sharing)| 0.61693 | 0.44336 | 0.31383 | 0.22263 | 0.2128 | 0.46285 | 0.4904 | 0.15042
 
+| Images | Caption with beam size = 3 |
+|:-------------------------:|:-------------------------:|
+| <img width="450" alt="screen" src="demo/0.jpg"> | **Bottom-up**: A man sits on a bench with a newspaper <br> **Patch-based**: A man in a hat and a hat is sitting on a bench <br />|
+| <img width="450" alt="screen" src="demo/1.jpg"> | **Bottom-up**: A snow boarder in a red jacket is jumping in the air <br> **Patch-based**: A snow boarder in a yellow shirt is jumping over a snowy hill <br />|
+| <img width="450" alt="screen" src="demo/2.jpg"> | **Bottom-up**: A man is sitting on a chair with a basket full of bread in front of him <br> **Patch-based**: A woman is selling fruit at a market <br />|
+| <img width="450" alt="screen" src="demo/3.jpg"> | **Bottom-up**: A group of people are playing music in a dark room <br> **Patch-based**: A man in a black shirt is standing in front of a large crowd of people <br />|
+| <img width="450" alt="screen" src="demo/4.jpg"> | **Bottom-up**: A man in a red uniform is riding a white horse <br> **Patch-based**: A man in a red shirt and white pants is riding a white horse <br />|
+
 ## Paper References
 - Ideas from:
   - [CPTR: FULL TRANSFORMER NETWORK FOR IMAGE CAPTIONING](https://arxiv.org/abs/2101.10804) (2021; Wei Liu, Sihan Chen et. al)
