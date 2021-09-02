@@ -30,6 +30,7 @@ Extract features and save as numpy array
 
 ## Datasets
 I train both the patch-based and bottom-up models on Flickr30k dataset which contains 31,000 images collected from Flickr, together with 5 reference sentences provided by human annotators for each image. Download COCO-format [Flickr30k](https://drive.google.com/drive/folders/1Q2Yc13oViObHB20kXh8pKaaEb6xJxe5N?usp=sharing)
+
 For COCO captioning data format, see [COCO format](https://cocodataset.org/#format-data)
 
 ## Results
