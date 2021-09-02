@@ -26,6 +26,7 @@ class CocoDataset(Dataset):
             keep_ratio=False,
             type='train'):
 
+        self.patch_size = 16
         self.root_dir = root_dir
         self.ann_path = ann_path
         self.image_size = image_size
