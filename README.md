@@ -21,11 +21,11 @@ Model | Bleu_1 | Bleu_2 | Bleu_3 | Bleu_4 | METEOR | ROUGE_L | CIDEr | SPICE
 
 | Images | Caption with beam size = 3 |
 |:-------------------------:|:-------------------------:|
-| <img width="450" alt="screen" src="demo/0.jpg"> | **Bottom-up**: A man sits on a bench with a newspaper <br> **Patch-based**: A man in a hat and a hat is sitting on a bench <br />|
-| <img width="450" alt="screen" src="demo/1.jpg"> | **Bottom-up**: A snow boarder in a red jacket is jumping in the air <br> **Patch-based**: A snow boarder in a yellow shirt is jumping over a snowy hill <br />|
-| <img width="450" alt="screen" src="demo/2.jpg"> | **Bottom-up**: A man is sitting on a chair with a basket full of bread in front of him <br> **Patch-based**: A woman is selling fruit at a market <br />|
-| <img width="450" alt="screen" src="demo/3.jpg"> | **Bottom-up**: A group of people are playing music in a dark room <br> **Patch-based**: A man in a black shirt is standing in front of a large crowd of people <br />|
-| <img width="450" alt="screen" src="demo/4.jpg"> | **Bottom-up**: A man in a red uniform is riding a white horse <br> **Patch-based**: A man in a red shirt and white pants is riding a white horse <br />|
+| <img width="450" alt="screen" src="demo/0.PNG"> | **Bottom-up**: A man sits on a bench with a newspaper <br> **Patch-based**: A man in a hat and a hat is sitting on a bench <br />|
+| <img width="450" alt="screen" src="demo/1.PNG"> | **Bottom-up**: A snow boarder in a red jacket is jumping in the air <br> **Patch-based**: A snow boarder in a yellow shirt is jumping over a snowy hill <br />|
+| <img width="450" alt="screen" src="demo/2.PNG"> | **Bottom-up**: A man is sitting on a chair with a basket full of bread in front of him <br> **Patch-based**: A woman is selling fruit at a market <br />|
+| <img width="450" alt="screen" src="demo/3.PNG"> | **Bottom-up**: A group of people are playing music in a dark room <br> **Patch-based**: A man in a black shirt is standing in front of a large crowd of people <br />|
+| <img width="450" alt="screen" src="demo/4.PNG"> | **Bottom-up**: A man in a red uniform is riding a white horse <br> **Patch-based**: A man in a red shirt and white pants is riding a white horse <br />|
 
 ## Paper References
 - Ideas from:
