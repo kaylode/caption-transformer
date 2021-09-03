@@ -1,6 +1,7 @@
 import os
 import pickle
 from utils.preprocess import *
+import matplotlib.pyplot as plt
 from pycocotools.coco import COCO
 
 class Vocabulary(object):
@@ -231,13 +232,118 @@ class Vocabulary(object):
     def __call__(self, texts, max_len=None):
         return self.tokenize(texts, max_len=max_len)
         
-
     def __len__(self):
         return len(self._word2idx)
 
     def __str__(self) -> str:
         s = f"Vocabulary size: {self.vocab_size}"
         return s
+
+    def most_common(self, topk = None, ngrams = None):
+        """
+        Return a dict of most common words
+        
+        Args:
+            topk: Top K words
+            ngrams: string
+                '1grams': unigram
+                '2grams': bigrams
+                '3grams': trigrams
+                
+        """
+        
+        if topk is None:
+            topk = self.max_size
+        idx = 0
+        common_dict = {}
+        
+        if ngrams is None:
+            for token, freq in self.freqs.items():
+                if idx >= topk:
+                    break
+                common_dict[token] = freq
+                idx += 1
+        else:
+            if ngrams == "1gram":
+                for token, freq in self.freqs.items():
+                    if idx >= topk:
+                        break
+                    if len(token.split()) == 1:
+                        common_dict[token] = freq
+                        idx += 1
+            if ngrams == "2grams":
+                for token, freq in self.freqs.items():
+                    if idx >= topk:
+                        break
+                    if len(token.split()) == 2:
+                        common_dict[token] = freq
+                        idx += 1
+            if ngrams == "3grams":
+                for token, freq in self.freqs.items():
+                    if idx >= topk:
+                        break
+                    if len(token.split()) == 3:
+                        common_dict[token] = freq
+                        idx += 1
+                
+            
+        return common_dict
+
+    def plot(self, types = None, topk = 100, figsize = (8,8) ):
+        """
+        Plot distribution of tokens:
+            types: list
+                "freqs": Tokens distribution
+                "allgrams": Plot every grams
+                "1gram - 2grams - 3grams" : Plot n-grams
+        """
+        ax = plt.figure(figsize = figsize)
+        if types is None:
+            types = ["freqs", "allgrams"]
+        
+        if "freqs" in types:
+            if "allgrams" in types:
+                plt.title("Top " + str(topk) + " highest frequency tokens")
+                plt.xlabel("Unique tokens")
+                plt.ylabel("Frequencies")
+                cnt_dict = self.most_common(topk)
+                bar1 = plt.barh(list(cnt_dict.keys()),
+                                list(cnt_dict.values()),
+                                color="blue")
+            else:
+                if "1gram" in types:
+                    plt.title("Top " + str(topk) + " highest frequency unigram tokens")
+                    plt.xlabel("Unique tokens")
+                    plt.ylabel("Frequencies")
+                    cnt_dict = self.most_common(topk, "1gram")
+                    bar1 = plt.barh(list(cnt_dict.keys()),
+                                    list(cnt_dict.values()),
+                                    color="blue",
+                                    label = "Unigrams")
+
+                if "2grams" in types:
+      
+                    plt.title("Top " + str(topk) + " highest frequency bigrams tokens")
+                    plt.xlabel("Unique tokens")
+                    plt.ylabel("Frequencies")
+                    cnt_dict = self.most_common(topk, "2grams")
+                    bar1 = plt.barh(list(cnt_dict.keys()),
+                                    list(cnt_dict.values()),
+                                    color="gray",
+                                    label = "Bigrams")
+
+                if "3grams" in types:
+                    plt.title("Top " + str(topk) + " highest frequency trigrams tokens")
+                    plt.xlabel("Unique tokens")
+                    plt.ylabel("Frequencies")
+                    cnt_dict = self.most_common(topk, "3grams")
+                    bar1 = plt.barh(list(cnt_dict.keys()),
+                                    list(cnt_dict.values()),
+                                    color="green",
+                                    label = "Trigrams") 
+            
+        plt.legend()
+        plt.show()
 
 if __name__ == '__main__':
     vocab = Vocabulary.from_coco_json('./val.json', max_size=5000)
