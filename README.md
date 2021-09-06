@@ -12,14 +12,14 @@ There are 2 ways to embed visual inputs:
 
 | Patch-based Encoders |
 |:-------------------------:|
-|<img height="200" alt="screen" src="demo/vit_encoder.PNG"> |
-|<img height="200" alt="screen" src="demo/inception_encoder.PNG"> |
+|<img width="1000" alt="screen" src="demo/vit_encoder.PNG"> |
+|<img height="270" alt="screen" src="demo/inception_encoder.PNG"> |
 
 - In the architecture which uses [bottom-up attention](https://arxiv.org/abs/1707.07998), FasterRCNN is used to extract features for each detected object in the image. This method captures visual meanings with object-aware semantics and generates some very good captions (in my opinion though).
 
 | Bottom-Up Encoder |
 |:-------------------------:|
-|<img height="200" alt="screen" src="demo/bottomup_encoder.PNG"> |
+|<img width="1000" alt="screen" src="demo/bottomup_encoder.PNG"> |
 
 Vocabulary can be built in two ways:
 - Use AutoTokenizer from Huggingface Transformer librabry
@@ -50,6 +50,17 @@ Model | Bleu_1 | Bleu_2 | Bleu_3 | Bleu_4 | METEOR | ROUGE_L | CIDEr | SPICE
 | <img width="450" alt="screen" src="demo/2.PNG"> | **Bottom-up**: A man is sitting on a chair with a basket full of bread in front of him <br> **Patch-based (flatten)**: A woman is selling fruit at a market <br />|
 | <img width="450" alt="screen" src="demo/3.PNG"> | **Bottom-up**: A group of people are playing music in a dark room <br> **Patch-based (flatten)**: A man in a black shirt is standing in front of a large crowd of people <br />|
 | <img width="450" alt="screen" src="demo/4.PNG"> | **Bottom-up**: A man in a red uniform is riding a white horse <br> **Patch-based (flatten)**: A man in a red shirt and white pants is riding a white horse <br />|
+
+## Usage
+- To train patch-based / bottom-up architecture:
+``` 
+python train.py (--bottom-up)
+```
+
+- To evalualte trained model:
+``` 
+python evaluate.py --weight=<checkpoint path> (--bottom-up)
+```
 
 ## Paper References
 Ideas from:
