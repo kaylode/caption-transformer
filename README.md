@@ -1,7 +1,7 @@
 # Image Captioning with Transformer
 This project applies Transformer-based model for Image captioning task. In this study project, most of the work are reimplemented, some are adapted with lots of modification. The purpose of this project is to test the performance of the Transformer architecture and Bottom-Up feature, I conduct experiment and compare two different ways to extract features from visual input (image) and encode it to a sequence.
 
-Notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1VtPzN1MTldl6AibDW8LwYWng3PjehL5T?usp=sharing)
+Notebook: [![Notebook](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/139Ze1c2tgolIOXVg88Dolpb367iqFCvu?usp=sharing)
 
 The following figure gives an overview of the baseline model architectures.
 
